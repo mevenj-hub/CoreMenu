@@ -545,7 +545,7 @@
       total: total.toFixed(2)
     };
 
-    const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_Btfp76htR5851lFpFjRU75S8KTMQAWeXD1U8LUo/exec";
 
     fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
@@ -553,7 +553,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     }).then(() => {
-      const targetWhatsApp = "9627XXXXXXXX";
+      const targetWhatsApp = "962780100050";
       const waText = encodeURIComponent(
         `*NEW ORDER RECEIVED*\n` +
         `----------------------\n` +
