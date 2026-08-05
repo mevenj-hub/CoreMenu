@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Core - Online Ordering Portal</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --card-bg: #e5e7eb;
+      --text-dark: #1f2937;
+      --text-muted: #6b7280;
+      --accent-black: #000000;
+      --radius: 20px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-dark);
+      margin: 0;
+      padding: 20px 12px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Header */
+    .logo-box {
+      width: 70px;
+      height: 70px;
+      background-color: var(--accent-black);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      letter-spacing: 2px;
+      font-size: 13px;
+      margin-bottom: 15px;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 0 12px 0;
+    }
+
+    .divider {
+      width: 100%;
+      border-bottom: 1px dashed #ccc;
+      margin-bottom: 18px;
+    }
+
+    /* Category Filters */
+    .categories {
+      display: flex;
+      gap: 6px;
+      width: 100%;
+      overflow-x: auto;
+      padding: 6px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .category-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      color: var(--text-dark);
+    }
+
+    .category-btn.active {
+      background: var(--accent-black);
+      color: #ffffff;
+    }
+
+    /* Toolbar / Search */
+    .toolbar {
+      width: 100%;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+
+    .search-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 55%;
+      font-size: 13px;
+    }
+
+    /* Product Cards */
+    .product-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .product-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .product-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .product-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #d1d5db;
+      flex-shrink: 0;
+    }
+
+    .product-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-details h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .product-details p {
+      margin: 3px 0 0 0;
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.2;
+    }
+
+    .product-action {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      min-width: 90px;
+    }
+
+    .price {
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .unit {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 2px 6px;
+    }
+
+    .qty-btn {
+      border: none;
+      background: transparent;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+      padding: 0 4px;
+    }
+
+    /* Option Selection */
+    .option-select-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px dashed #d1d5db;
+      padding-top: 6px;
+      margin-top: 2px;
+    }
+
+    .option-select-container label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .option-select {
+      background: #ffffff;
+      border: 1px solid #cccccc;
+      border-radius: 8px;
+      padding: 3px 8px;
+      font-size: 11px;
+      outline: none;
+    }
+
+    /* Form & Checkout Section */
+    .checkout-section {
+      width: 100%;
+      margin-top: 25px;
+      border-top: 2px solid #e5e7eb;
+      padding-top: 15px;
+    }
+
+    .checkout-section h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .form-group input, .form-group select {
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--accent-black);
+      color: #ffffff;
+      border: none;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Brand Header -->
+  <div class="logo-box">CORE</div>
+  <h1>Menu Core</h1>
+  <div class="divider"></div>
+
+  <!-- Categories -->
+  <div class="categories">
+    <button class="category-btn active" onclick="filterCategory('All')">All</button>
+    <button class="category-btn" onclick="filterCategory('Salad')">Salads سلطات</button>
+    <button class="category-btn" onclick="filterCategory('Sandwiches')">Sandwiches سندويشات</button>
+    <button class="category-btn" onclick="filterCategory('Dessert')">Desserts حلويات</button>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <span id="product-count" style="font-size: 12px; font-weight: 500;">Listing products</span>
+    <input type="text" id="search" class="search-input" placeholder="🔍 Search product" onkeyup="searchProducts()">
+  </div>
+
+  <!-- Product List -->
+  <div class="product-list" id="product-list">
+    <!-- Rendered via JS -->
+  </div>
+
+  <!-- Checkout Form -->
+  <div class="checkout-section">
+    <h2>Checkout Details</h2>
+    <form id="orderForm" onsubmit="handleOrderSubmit(event)">
+      
+      <div class="form-group">
+        <label for="fullName">Full Name *</label>
+        <input type="text" id="fullName" required placeholder="Enter your full name">
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number *</label>
+        <input type="tel" id="phone" required placeholder="e.g. 07XXXXXXXX">
+      </div>
+
+      <div class="form-group">
+        <label for="receivingDate">Receiving Date (Future Date) *</label>
+        <input type="date" id="receivingDate" required>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Location Address *</label>
+        <input type="text" id="address" required placeholder="City, Street, Building No.">
+      </div>
+
+      <div class="form-group">
+        <label for="paymentMethod">Payment Method *</label>
+        <select id="paymentMethod" required>
+          <option value="Cash on Delivery">Cash on Delivery</option>
+          <option value="CliQ">CliQ</option>
+        </select>
+      </div>
+
+      <!-- Total summary -->
+      <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: bold; margin: 15px 0;">
+        <span>Total Amount:</span>
+        <span id="total-price">JOD 0.00</span>
+      </div>
+
+      <button type="submit" class="submit-btn">Submit Order</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Complete Dataset from spreadsheet
+  const products = [
+    // Salads
+    { id: 1, name: "Fusion Salad سلطة فيوجن", category: "Salad", price: 2.75, desc: "Lettuce, Rocca, Avocado, Cherry tomatoes, Corn, Green apple, Walnuts, Raisins, Date, Parmesan, Special Dressing", options: ["Bowl", "Jar"] },
+    { id: 2, name: "Rocca Salad سلطة جرجير", category: "Salad", price: 1.75, desc: "Rocca Leaves, Mushroom, Cherry Tomatoes and Parmesan Cheese, Citrus Balsamic Dressing.", options: ["Bowl", "Jar"] },
+    { id: 3, name: "Greek Salad سلطة يونانية", category: "Salad", price: 2.00, desc: "Feta cheese, Lettuce, Colored bell pepper, Cherry tomatoes, Cucumber, Olives, Greek Herb Vinaigrette Dressing.", options: ["Bowl", "Jar"] },
+    { id: 4, name: "Grilled Halloumi Salad سلطة حلوم", category: "Salad", price: 2.25, desc: "Halloumi cheese, Lettuce, Rocca (Arugula), Bell pepper, Cherry tomatoes, Cucumber, Black Olive, Mayo Berry Dressing.", options: ["Bowl", "Jar"] },
+    { id: 5, name: "Quinoa Salad سلطة كينوا", category: "Salad", price: 2.00, desc: "Spinach Leaves, Quinoa, Tomatoes and Pomegranate, Lemon Dressing.", options: ["Bowl", "Jar"] },
+    { id: 6, name: "Beetroot Salad سلطة شمندر", category: "Salad", price: 2.25, desc: "Rocca, Orange, Pineapple, Walnuts, Green apple, Beetroot, Carrots, Lettuce, Pomegranate Citrus Dressing.", options: ["Bowl", "Jar"] },
+    { id: 7, name: "Pasta Salad سلطة باستا", category: "Salad", price: 2.00, desc: "Pasta, Cherry tomatoes, Cucumber, Bell peppers, Carrots, Olives, Feta cheese, Pesto Dressing.", options: ["Bowl", "Jar"] },
+    { id: 8, name: "Chicken Pasta Salad سلطة باستا مع دجاج", category: "Salad", price: 2.75, desc: "Grilled Chicken Breast, Cucumber, Bell Pepper, Red Onion, Sweet Corn, Carrot, Parmesan Cheese, Pesto Dressing.", options: ["Bowl", "Jar"] },
+    { id: 9, name: "Chicken Caesar Salad سلطة سيزر", category: "Salad", price: 2.75, desc: "Grilled chicken breast, Lettuce, Croton, Rocca, Parmesan cheese, Caesar dressing", options: ["Bowl", "Jar"] },
+    { id: 10, name: "Mexican Chicken Salad سلطة مكسيكية", category: "Salad", price: 2.75, desc: "Grilled chicken breast, Toasted tortillas, Lettuce, Tomatoes, Corn, Black beans, Avocado, Olives, Cheddar cheese, Spicy Mayo Dressing", options: ["Bowl", "Jar"] },
+    { id: 11, name: "Tuna Salad سلطة تونا", category: "Salad", price: 2.25, desc: "Tuna, Iceberg lettuce, Rocca, Corn, Olives, Cucumber pickles, Radish pickles, White mushrooms, Sesame Soy Mustard Dressing", options: ["Bowl", "Jar"] },
+    { id: 12, name: "Crunchy Chicken Salad سلطة كرنشي", category: "Salad", price: 2.75, desc: "Crispy Chicken, Sweet Corn, Red cabbage, Cherry Tomatoes, Cucumber, Carrot, Lettuce, Rocca, Honey mustard Dressing.", options: ["Bowl", "Jar"] },
+
+    // Sandwiches
+    { id: 13, name: "Cheese Sandwich ساندويش جبنة", category: "Sandwiches", price: 1.75, desc: "Emmental Cheese, Arugula, Tomato Slices, Cucumber, Red Onion, Pickles.", options: ["Whole Wheat", "White Bread"] },
+    { id: 14, name: "Pesto Halloumi Sandwich ساندويش بيستو مع حلوم", category: "Sandwiches", price: 1.75, desc: "Grilled Halloumi Cheese, Rocca Leaves, Tomatoes, Pesto Sauce.", options: ["Whole Wheat", "White Bread"] },
+    { id: 15, name: "Turkey Sandwich ساندويش تيركي", category: "Sandwiches", price: 1.75, desc: "Turkey, Cheddar Cheese, Lettuce, Pickles, Berry Mayo Sauce", options: ["Whole Wheat", "White Bread"] },
+    { id: 16, name: "Roast Beef Sandwich ساندويش روست بيف", category: "Sandwiches", price: 1.75, desc: "Roast Beef, Pickles, Fresh Lettuce, Cheddar Cheese, Honey Mustard Sauce.", options: ["Whole Wheat", "White Bread"] },
+    { id: 17, name: "Turkey & Roast Beef Sandwich ساندويش تيركي و روست بيف", category: "Sandwiches", price: 1.75, desc: "Turkey, Roast Beef, Pickles, Fresh Lettuce, Cheddar Cheese, Honey Mustard Sauce.", options: ["Whole Wheat", "White Bread"] },
+    { id: 18, name: "Club Sandwich ساندويش كلوب", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Turkey, Roast Beef, Light Mayo, Fresh Lettuce, Cheddar Cheese", options: ["Whole Wheat", "White Bread"] },
+    { id: 19, name: "Pepperoni Sandwich ساندويش ببروني", category: "Sandwiches", price: 2.25, desc: "Pepperoni, Roast Beef, Rocca Leaves, Tomatoes, Light Mayo, Mozzarella cheese.", options: ["Whole Wheat", "White Bread"] },
+    { id: 20, name: "Chicken Caesar Sandwich ساندويش سيزر", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Iceberg lettuce, Parmesan Cheese, Caesar Sauce.", options: ["Whole Wheat", "White Bread"] },
+    { id: 21, name: "Chicken Pesto Sandwich ساندويش دجاج بالبيستو", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Sundried tomatoes, Pesto Dressing, Rocca, Light Mayo and Mozzarella cheese.", options: ["Whole Wheat", "White Bread"] },
+    { id: 22, name: "Chicken Fajita Sandwich ساندويش فاهيتا", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Bell pepper, Onion, Dynamite Sauce, Cheddar Cheese.", options: ["Whole Wheat", "White Bread"] },
+    { id: 23, name: "Chicken Tandoori Sandwich ساندويش تندوري", category: "Sandwiches", price: 2.25, desc: "Chicken Breast, Lettuce, Tomato, Red Onion, Shredded Carrots, Fresh Cilantro, Tandoori Sauce.", options: ["Whole Wheat", "White Bread"] },
+    { id: 24, name: "Chicken Wrap راب دجاج", category: "Sandwiches", price: 2.25, desc: "Crispy Chicken, Cheddar Cheese, Lettuce, Pickles, Ranch Sauce.", options: ["Whole Wheat", "White Bread"] },
+    { id: 25, name: "Chicken Dynamite Wrap راب دجاج ديناميت", category: "Sandwiches", price: 2.25, desc: "Crispy Chicken, Cheddar Cheese, Lettuce, Pickles, Jalapeños, Spicy Ranch Sauce.", options: ["Whole Wheat", "White Bread"] },
+    { id: 26, name: "BBQ Chicken Wrap راب دجاج باربكيو", category: "Sandwiches", price: 2.25, desc: "Crispy Chicken, Cheddar Cheese, Lettuce, Smoked Turkey Bacon, Red Onion, Pickles, BBQ Sauce.", options: ["Whole Wheat", "White Bread"] },
+    { id: 27, name: "Tuna Sandwich ساندويش تونا", category: "Sandwiches", price: 2.00, desc: "Tuna, Rocca Leaves, Sweet Corn, Black Olives, Onion, Light Mayo, Lemon Slices.", options: ["Whole Wheat", "White Bread"] },
+
+    // Desserts
+    { id: 28, name: "Lazycake Balls ليزي كيك كرات", category: "Dessert", price: 1.75, desc: "", options: [] },
+    { id: 29, name: "Cheesecake تشيز كيك بارد", category: "Dessert", price: 1.75, desc: "", options: [] },
+    { id: 30, name: "Baked Cheesecake تشيز كيك مخبوز", category: "Dessert", price: 1.75, desc: "", options: [] },
+    { id: 31, name: "Brownies بروانيز", category: "Dessert", price: 1.75, desc: "", options: [] },
+    { id: 32, name: "Blondies بلوندي", category: "Dessert", price: 1.75, desc: "", options: [] },
+    { id: 33, name: "Muffin مافن", category: "Dessert", price: 1.50, desc: "", options: [] }
+  ];
+
+  let cart = {}; // Stores { id: { qty, selectedOption } }
+  let activeCategory = 'All';
+
+  // Set min date to tomorrow
+  const dateInput = document.getElementById('receivingDate');
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  dateInput.min = tomorrow.toISOString().split('T')[0];
+
+  function renderProducts(items) {
+    const list = document.getElementById('product-list');
+    list.innerHTML = '';
+    document.getElementById('product-count').innerText = `Listing ${items.length} products`;
+
+    items.forEach(p => {
+      const cartItem = cart[p.id] || { qty: 0, option: p.options ? p.options[0] : '' };
+      
+      let optionsHTML = '';
+      if (p.options && p.options.length > 0) {
+        optionsHTML = `
+          <div class="option-select-container">
+            <label for="opt-${p.id}">Select Choice:</label>
+            <select id="opt-${p.id}" class="option-select" onchange="changeOption(${p.id}, this.value)">
+              ${p.options.map(opt => `<option value="${opt}" ${cartItem.option === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      }
+
+      list.innerHTML += `
+        <div class="product-card">
+          <div class="product-main">
+            <div class="product-info">
+              <div class="product-img"></div>
+              <div class="product-details">
+                <h3>${p.name}</h3>
+                ${p.desc ? `<p>${p.desc}</p>` : ''}
+              </div>
+            </div>
+            <div class="product-action">
+              <div class="price">JOD ${p.price.toFixed(2)}</div>
+              <div class="unit">Unit</div>
+              <div class="qty-controls">
+                <button class="qty-btn" type="button" onclick="updateQty(${p.id}, -1)">-</button>
+                <span>${cartItem.qty}</span>
+                <button class="qty-btn" type="button" onclick="updateQty(${p.id}, 1)">+</button>
+              </div>
+            </div>
+          </div>
+          ${optionsHTML}
+        </div>
+      `;
+    });
+  }
+
+  function updateQty(id, change) {
+    const p = products.find(item => item.id === id);
+    if (!cart[id]) {
+      const defaultOption = p.options && p.options.length > 0 ? p.options[0] : '';
+      cart[id] = { qty: 0, option: defaultOption };
+    }
+
+    cart[id].qty += change;
+
+    if (cart[id].qty <= 0) {
+      delete cart[id];
+    }
+
+    applyCurrentFilters();
+    calculateTotal();
+  }
+
+  function changeOption(id, selectedValue) {
+    if (cart[id]) {
+      cart[id].option = selectedValue;
+    } else {
+      cart[id] = { qty: 0, option: selectedValue };
+    }
+  }
+
+  function calculateTotal() {
+    let total = 0;
+    for (let id in cart) {
+      const item = products.find(p => p.id == id);
+      total += item.price * cart[id].qty;
+    }
+    document.getElementById('total-price').innerText = `JOD ${total.toFixed(2)}`;
+    return total;
+  }
+
+  function filterCategory(cat) {
+    activeCategory = cat;
+    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    applyCurrentFilters();
+  }
+
+  function searchProducts() {
+    applyCurrentFilters();
+  }
+
+  function applyCurrentFilters() {
+    const query = document.getElementById('search').value.toLowerCase();
+    let filtered = products;
+
+    if (activeCategory !== 'All') {
+      filtered = filtered.filter(p => p.category === activeCategory);
+    }
+
+    if (query) {
+      filtered = filtered.filter(p => p.name.toLowerCase().includes(query));
+    }
+
+    renderProducts(filtered);
+  }
+
+  function handleOrderSubmit(e) {
+    e.preventDefault();
+    const total = calculateTotal();
+    if (total === 0) {
+      alert('Please select at least one item before submitting your order.');
+      return;
+    }
+
+    // Build item summary line items
+    let itemsSummary = [];
+    for (let id in cart) {
+      if (cart[id].qty > 0) {
+        const item = products.find(p => p.id == id);
+        const optText = cart[id].option ? ` (${cart[id].option})` : '';
+        itemsSummary.push(`${item.name}${optText} x${cart[id].qty}`);
+      }
+    }
+
+    const payload = {
+      name: document.getElementById('fullName').value,
+      phone: document.getElementById('phone').value,
+      date: document.getElementById('receivingDate').value,
+      address: document.getElementById('address').value,
+      payment: document.getElementById('paymentMethod').value,
+      items: itemsSummary.join('\n'),
+      total: total.toFixed(2)
+    };
+
+    // Google Apps Script Web App Endpoint URL
+    const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+
+    // Post to Google Sheet
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(() => {
+      // Direct WhatsApp redirect with formatted summary
+      const targetWhatsApp = "9627XXXXXXXX"; // Substitute target phone number
+      const waText = encodeURIComponent(
+        `*NEW ORDER RECEIVED*\n` +
+        `----------------------\n` +
+        `*Customer Name:* ${payload.name}\n` +
+        `*Phone:* ${payload.phone}\n` +
+        `*Receiving Date:* ${payload.date}\n` +
+        `*Address:* ${payload.address}\n` +
+        `*Payment Method:* ${payload.payment}\n\n` +
+        `*Order Items:*\n${payload.items}\n\n` +
+        `*Total Amount:* JOD ${payload.total}`
+      );
+
+      alert("Order submitted successfully!");
+      window.open(`https://wa.me/${targetWhatsApp}?text=${waText}`, '_blank');
+    }).catch(err => {
+      alert("Submission error: " + err);
+    });
+  }
+
+  // Initial render
+  renderProducts(products);
+</script>
+</body>
+</html>
