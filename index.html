@@ -401,7 +401,7 @@
   tomorrow.setDate(tomorrow.getDate() + 1);
   dateInput.min = tomorrow.toISOString().split('T')[0];
 
-function renderProducts(items) {
+  function renderProducts(items) {
     const list = document.getElementById('product-list');
     list.innerHTML = '';
     document.getElementById('product-count').innerText = `Listing ${items.length} products`;
@@ -421,7 +421,7 @@ function renderProducts(items) {
         `;
       }
 
-      // Clean image rendering without string escaping errors
+      // Safely check for image file or display plain grey circle placeholder
       const imgHTML = p.img 
         ? `<img src="${p.img}" class="product-img" alt="${p.name}">`
         : `<div class="product-img"></div>`;
@@ -431,34 +431,6 @@ function renderProducts(items) {
           <div class="product-main">
             <div class="product-info">
               ${imgHTML}
-              <div class="product-details">
-                <h3>${p.name}</h3>
-                ${p.desc ? `<p>${p.desc}</p>` : ''}
-              </div>
-            </div>
-            <div class="product-action">
-              <div class="price">JOD ${p.price.toFixed(2)}</div>
-              <div class="unit">Unit</div>
-              <div class="qty-controls">
-                <button class="qty-btn" type="button" onclick="updateQty(${p.id}, -1)">-</button>
-                <span>${cartItem.qty}</span>
-                <button class="qty-btn" type="button" onclick="updateQty(${p.id}, 1)">+</button>
-              </div>
-            </div>
-          </div>
-          ${optionsHTML}
-        </div>
-      `;
-    });
-  }
-      // Proper img fallback handling
-      const imgSrc = p.img ? p.img : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="%23d1d5db"/></svg>';
-
-      list.innerHTML += `
-        <div class="product-card">
-          <div class="product-main">
-            <div class="product-info">
-              <img src="${imgSrc}" class="product-img" alt="${p.name}" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'><circle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23d1d5db\'/></svg>';">
               <div class="product-details">
                 <h3>${p.name}</h3>
                 ${p.desc ? `<p>${p.desc}</p>` : ''}
