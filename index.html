@@ -569,34 +569,18 @@
 
   // Initial render
   renderProducts(products);
-</script>
+<!-- Inside index.html near the bottom -->
+<script>
   const products = [
-  { 
-    id: 1, 
-    name: "BBQ Chicken Wrap", 
-    category: "Wraps", 
-    price: 2.75, 
-    desc: "...", 
-    img: "BBQ Chicken Wrap.png" // Matches the exact filename uploaded
-  },
-  { 
-    id: 2, 
-    name: "Baked Cheesecake", 
-    category: "Desserts", 
-    price: 2.00, 
-    desc: "...", 
-    img: "Baked Cheesecake.jfif" // Note the .jfif extension!
-  },
-  { 
-    id: 3, 
-    name: "Chicken Caesar Salad", 
-    category: "Salad", 
-    price: 2.50, 
-    desc: "...", 
-    img: "Chicken Caesar Salad.png" 
-  }
-  // ... continue updating the rest of your items!
-];
+    { id: 1, name: "Fusion Salad سلطة فيوجن", category: "Salad", price: 2.75, desc: "Lettuce, Rocca, Avocado...", options: ["Bowl", "Jar"], img: "Fusion Salad.png" },
+    { id: 2, name: "Rocca Salad سلطة جرجير", category: "Salad", price: 1.75, desc: "Rocca Leaves, Mushroom...", options: ["Bowl", "Jar"], img: "Rocca Salad.png" },
+    { id: 3, name: "Greek Salad سلطة يونانية", category: "Salad", price: 2.00, desc: "Feta cheese, Lettuce...", options: ["Bowl", "Jar"], img: "Greek Salad.png" },
+    { id: 4, name: "Grilled Halloumi Salad سلطة حلوم", category: "Salad", price: 2.25, desc: "Halloumi cheese, Lettuce...", options: ["Bowl", "Jar"], img: "Grilled Halloumi Salad.png" },
+    { id: 5, name: "Quinoa Salad سلطة كينوا", category: "Salad", price: 2.00, desc: "Spinach Leaves, Quinoa...", options: ["Bowl", "Jar"], img: "Quinoa Salad.png" }
+    // ... update the remaining items matching your filenames
+  ];
+
+  // ... rest of your code ...
 </script>
 </body>
 </html>
