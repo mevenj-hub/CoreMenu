@@ -350,7 +350,7 @@
 </div>
 
 <script>
-  // Complete Dataset mapped to uploaded image files
+  // Complete Dataset cleaned from line break syntax errors
   const products = [
     // Salads
     { id: 1, name: "Fusion Salad سلطة فيوجن", category: "Salad", price: 2.75, desc: "Lettuce, Rocca, Avocado, Cherry tomatoes, Corn, Green apple, Walnuts, Raisins, Date, Parmesan, Special Dressing", options: ["Bowl", "Jar"], img: "Fusion Salad.png" },
@@ -369,15 +369,11 @@
     // Sandwiches
     { id: 13, name: "Cheese Sandwich ساندويش جبنة", category: "Sandwiches", price: 1.75, desc: "Emmental Cheese, Arugula, Tomato Slices, Cucumber, Red Onion, Pickles.", options: ["Whole Wheat", "White Bread"], img: "Cheese Sandwich.jfif" },
     { id: 14, name: "Pesto Halloumi Sandwich ساندويش بيستو مع حلوم", category: "Sandwiches", price: 1.75, desc: "Grilled Halloumi Cheese, Rocca Leaves, Tomatoes, Pesto Sauce.", options: ["Whole Wheat", "White Bread"], img: "Pesto Halloumi Sandwich.png" },
-    { id: 15, name: "Turkey Sandwich ساندويش تيركي", category: "Sandwiches", price: 1.75, desc: "Turkey, Cheddar Cheese, Lettuce, Pickles, Berry Mayo Sauce", options: ["Whole Wheat", "White Bread"], img: "
-Turkey Sandwich.png" },
-    { id: 16, name: "Roast Beef Sandwich ساندويش روست بيف", category: "Sandwiches", price: 1.75, desc: "Roast Beef, Pickles, Fresh Lettuce, Cheddar Cheese, Honey Mustard Sauce.", options: ["Whole Wheat", "White Bread"], img: "
-Roast Beef Sandwich.png" },
-    { id: 17, name: "Turkey & Roast Beef Sandwich ساندويش تيركي و روست بيف", category: "Sandwiches", price: 1.75, desc: "Turkey, Roast Beef, Pickles, Fresh Lettuce, Cheddar Cheese, Honey Mustard Sauce.", options: ["Whole Wheat", "White Bread"], img: "
-Turkey & Roast Beef Sandwich.png" },
+    { id: 15, name: "Turkey Sandwich ساندويش تيركي", category: "Sandwiches", price: 1.75, desc: "Turkey, Cheddar Cheese, Lettuce, Pickles, Berry Mayo Sauce", options: ["Whole Wheat", "White Bread"], img: "Turkey Sandwich.png" },
+    { id: 16, name: "Roast Beef Sandwich ساندويش روست بيف", category: "Sandwiches", price: 1.75, desc: "Roast Beef, Pickles, Fresh Lettuce, Cheddar Cheese, Honey Mustard Sauce.", options: ["Whole Wheat", "White Bread"], img: "Roast Beef Sandwich.png" },
+    { id: 17, name: "Turkey & Roast Beef Sandwich ساندويش تيركي و روست بيف", category: "Sandwiches", price: 1.75, desc: "Turkey, Roast Beef, Pickles, Fresh Lettuce, Cheddar Cheese, Honey Mustard Sauce.", options: ["Whole Wheat", "White Bread"], img: "Turkey & Roast Beef Sandwich.png" },
     { id: 18, name: "Club Sandwich ساندويش كلوب", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Turkey, Roast Beef, Light Mayo, Fresh Lettuce, Cheddar Cheese", options: ["Whole Wheat", "White Bread"], img: "Club Sandwich.png" },
-    { id: 19, name: "Pepperoni Sandwich ساندويش ببروني", category: "Sandwiches", price: 2.25, desc: "Pepperoni, Roast Beef, Rocca Leaves, Tomatoes, Light Mayo, Mozzarella cheese.", options: ["Whole Wheat", "White Bread"], img: "
-Pepperoni Sandwich.png" },
+    { id: 19, name: "Pepperoni Sandwich ساندويش ببروني", category: "Sandwiches", price: 2.25, desc: "Pepperoni, Roast Beef, Rocca Leaves, Tomatoes, Light Mayo, Mozzarella cheese.", options: ["Whole Wheat", "White Bread"], img: "Pepperoni Sandwich.png" },
     { id: 20, name: "Chicken Caesar Sandwich ساندويش سيزر", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Iceberg lettuce, Parmesan Cheese, Caesar Sauce.", options: ["Whole Wheat", "White Bread"], img: "Chicken Caesar Sandwich.png" },
     { id: 21, name: "Chicken Pesto Sandwich ساندويش دجاج بالبيستو", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Sundried tomatoes, Pesto Dressing, Rocca, Light Mayo and Mozzarella cheese.", options: ["Whole Wheat", "White Bread"], img: "Chicken Pesto Sandwich.png" },
     { id: 22, name: "Chicken Fajita Sandwich ساندويش فاهيتا", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Bell pepper, Onion, Dynamite Sauce, Cheddar Cheese.", options: ["Whole Wheat", "White Bread"], img: "Chicken Fajita Sandwich.png" },
@@ -385,12 +381,10 @@ Pepperoni Sandwich.png" },
     { id: 24, name: "Chicken Wrap راب دجاج", category: "Sandwiches", price: 2.25, desc: "Crispy Chicken, Cheddar Cheese, Lettuce, Pickles, Ranch Sauce.", options: ["Whole Wheat", "White Bread"], img: "Chicken Wrap.png" },
     { id: 25, name: "Chicken Dynamite Wrap راب دجاج ديناميت", category: "Sandwiches", price: 2.25, desc: "Crispy Chicken, Cheddar Cheese, Lettuce, Pickles, Jalapeños, Spicy Ranch Sauce.", options: ["Whole Wheat", "White Bread"], img: "Chicken Dynamite Wrap.png" },
     { id: 26, name: "BBQ Chicken Wrap راب دجاج باربكيو", category: "Sandwiches", price: 2.25, desc: "Crispy Chicken, Cheddar Cheese, Lettuce, Smoked Turkey Bacon, Red Onion, Pickles, BBQ Sauce.", options: ["Whole Wheat", "White Bread"], img: "BBQ Chicken Wrap.png" },
-    { id: 27, name: "Tuna Sandwich ساندويش تونا", category: "Sandwiches", price: 2.00, desc: "Tuna, Rocca Leaves, Sweet Corn, Black Olives, Onion, Light Mayo, Lemon Slices.", options: ["Whole Wheat", "White Bread"], img: "
-Tuna Sandwich.png" },
+    { id: 27, name: "Tuna Sandwich ساندويش تونا", category: "Sandwiches", price: 2.00, desc: "Tuna, Rocca Leaves, Sweet Corn, Black Olives, Onion, Light Mayo, Lemon Slices.", options: ["Whole Wheat", "White Bread"], img: "Tuna Sandwich.png" },
 
     // Desserts
-    { id: 28, name: "Lazycake Balls ليزي كيك كرات", category: "Dessert", price: 1.75, desc: "", options: [], img: "
-Lazycake Balls.png" },
+    { id: 28, name: "Lazycake Balls ليزي كيك كرات", category: "Dessert", price: 1.75, desc: "", options: [], img: "Lazycake Balls.png" },
     { id: 29, name: "Cheesecake تشيز كيك بارد", category: "Dessert", price: 1.75, desc: "", options: [], img: "Cheesecake.jfif" },
     { id: 30, name: "Baked Cheesecake تشيز كيك مخبوز", category: "Dessert", price: 1.75, desc: "", options: [], img: "Baked Cheesecake.jfif" },
     { id: 31, name: "Brownies بروانيز", category: "Dessert", price: 1.75, desc: "", options: [], img: "Brownies.jfif" },
@@ -427,7 +421,6 @@ Lazycake Balls.png" },
         `;
       }
 
-      // Safely check for image file or display plain grey circle placeholder
       const imgHTML = p.img 
         ? `<img src="${p.img}" class="product-img" alt="${p.name}">`
         : `<div class="product-img"></div>`;
@@ -511,7 +504,11 @@ Lazycake Balls.png" },
     let filtered = products;
 
     if (activeCategory !== 'All') {
-      filtered = filtered.filter(p => p.category === activeCategory);
+      filtered = filtered.filter(p => {
+        // Flexible category matching for "Salad/Salads", "Sandwiches", "Dessert/Desserts"
+        const cleanCategory = activeCategory.toLowerCase().replace(/s$/, '');
+        return p.category.toLowerCase().includes(cleanCategory);
+      });
     }
 
     if (query) {
