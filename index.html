@@ -288,10 +288,10 @@
 
   <!-- Categories -->
   <div class="categories">
-    <button class="category-btn active" onclick="filterCategory('All')">All</button>
-    <button class="category-btn" onclick="filterCategory('Salad')">Salads سلطات</button>
-    <button class="category-btn" onclick="filterCategory('Sandwiches')">Sandwiches سندويشات</button>
-    <button class="category-btn" onclick="filterCategory('Dessert')">Desserts حلويات</button>
+    <button class="category-btn active" onclick="filterCategory('All', event)">All</button>
+    <button class="category-btn" onclick="filterCategory('Salad', event)">Salads سلطات</button>
+    <button class="category-btn" onclick="filterCategory('Sandwiches', event)">Sandwiches سندويشات</button>
+    <button class="category-btn" onclick="filterCategory('Dessert', event)">Desserts حلويات</button>
   </div>
 
   <!-- Toolbar -->
@@ -350,46 +350,46 @@
 </div>
 
 <script>
-  // Complete Dataset from spreadsheet
+  // Complete Dataset mapped to uploaded image files
   const products = [
     // Salads
-    { id: 1, name: "Fusion Salad سلطة فيوجن", category: "Salad", price: 2.75, desc: "Lettuce, Rocca, Avocado, Cherry tomatoes, Corn, Green apple, Walnuts, Raisins, Date, Parmesan, Special Dressing", options: ["Bowl", "Jar"] },
-    { id: 2, name: "Rocca Salad سلطة جرجير", category: "Salad", price: 1.75, desc: "Rocca Leaves, Mushroom, Cherry Tomatoes and Parmesan Cheese, Citrus Balsamic Dressing.", options: ["Bowl", "Jar"] },
-    { id: 3, name: "Greek Salad سلطة يونانية", category: "Salad", price: 2.00, desc: "Feta cheese, Lettuce, Colored bell pepper, Cherry tomatoes, Cucumber, Olives, Greek Herb Vinaigrette Dressing.", options: ["Bowl", "Jar"] },
-    { id: 4, name: "Grilled Halloumi Salad سلطة حلوم", category: "Salad", price: 2.25, desc: "Halloumi cheese, Lettuce, Rocca (Arugula), Bell pepper, Cherry tomatoes, Cucumber, Black Olive, Mayo Berry Dressing.", options: ["Bowl", "Jar"] },
-    { id: 5, name: "Quinoa Salad سلطة كينوا", category: "Salad", price: 2.00, desc: "Spinach Leaves, Quinoa, Tomatoes and Pomegranate, Lemon Dressing.", options: ["Bowl", "Jar"] },
-    { id: 6, name: "Beetroot Salad سلطة شمندر", category: "Salad", price: 2.25, desc: "Rocca, Orange, Pineapple, Walnuts, Green apple, Beetroot, Carrots, Lettuce, Pomegranate Citrus Dressing.", options: ["Bowl", "Jar"] },
-    { id: 7, name: "Pasta Salad سلطة باستا", category: "Salad", price: 2.00, desc: "Pasta, Cherry tomatoes, Cucumber, Bell peppers, Carrots, Olives, Feta cheese, Pesto Dressing.", options: ["Bowl", "Jar"] },
-    { id: 8, name: "Chicken Pasta Salad سلطة باستا مع دجاج", category: "Salad", price: 2.75, desc: "Grilled Chicken Breast, Cucumber, Bell Pepper, Red Onion, Sweet Corn, Carrot, Parmesan Cheese, Pesto Dressing.", options: ["Bowl", "Jar"] },
-    { id: 9, name: "Chicken Caesar Salad سلطة سيزر", category: "Salad", price: 2.75, desc: "Grilled chicken breast, Lettuce, Croton, Rocca, Parmesan cheese, Caesar dressing", options: ["Bowl", "Jar"] },
-    { id: 10, name: "Mexican Chicken Salad سلطة مكسيكية", category: "Salad", price: 2.75, desc: "Grilled chicken breast, Toasted tortillas, Lettuce, Tomatoes, Corn, Black beans, Avocado, Olives, Cheddar cheese, Spicy Mayo Dressing", options: ["Bowl", "Jar"] },
-    { id: 11, name: "Tuna Salad سلطة تونا", category: "Salad", price: 2.25, desc: "Tuna, Iceberg lettuce, Rocca, Corn, Olives, Cucumber pickles, Radish pickles, White mushrooms, Sesame Soy Mustard Dressing", options: ["Bowl", "Jar"] },
-    { id: 12, name: "Crunchy Chicken Salad سلطة كرنشي", category: "Salad", price: 2.75, desc: "Crispy Chicken, Sweet Corn, Red cabbage, Cherry Tomatoes, Cucumber, Carrot, Lettuce, Rocca, Honey mustard Dressing.", options: ["Bowl", "Jar"] },
+    { id: 1, name: "Fusion Salad سلطة فيوجن", category: "Salad", price: 2.75, desc: "Lettuce, Rocca, Avocado, Cherry tomatoes, Corn, Green apple, Walnuts, Raisins, Date, Parmesan, Special Dressing", options: ["Bowl", "Jar"], img: "Fusion Salad.png" },
+    { id: 2, name: "Rocca Salad سلطة جرجير", category: "Salad", price: 1.75, desc: "Rocca Leaves, Mushroom, Cherry Tomatoes and Parmesan Cheese, Citrus Balsamic Dressing.", options: ["Bowl", "Jar"], img: "Rocca Salad.png" },
+    { id: 3, name: "Greek Salad سلطة يونانية", category: "Salad", price: 2.00, desc: "Feta cheese, Lettuce, Colored bell pepper, Cherry tomatoes, Cucumber, Olives, Greek Herb Vinaigrette Dressing.", options: ["Bowl", "Jar"], img: "Greek Salad.png" },
+    { id: 4, name: "Grilled Halloumi Salad سلطة حلوم", category: "Salad", price: 2.25, desc: "Halloumi cheese, Lettuce, Rocca (Arugula), Bell pepper, Cherry tomatoes, Cucumber, Black Olive, Mayo Berry Dressing.", options: ["Bowl", "Jar"], img: "Grilled Halloumi Salad.png" },
+    { id: 5, name: "Quinoa Salad سلطة كينوا", category: "Salad", price: 2.00, desc: "Spinach Leaves, Quinoa, Tomatoes and Pomegranate, Lemon Dressing.", options: ["Bowl", "Jar"], img: "Quinoa Salad.png" },
+    { id: 6, name: "Beetroot Salad سلطة شمندر", category: "Salad", price: 2.25, desc: "Rocca, Orange, Pineapple, Walnuts, Green apple, Beetroot, Carrots, Lettuce, Pomegranate Citrus Dressing.", options: ["Bowl", "Jar"], img: "Beetroot Salad.png" },
+    { id: 7, name: "Pasta Salad سلطة باستا", category: "Salad", price: 2.00, desc: "Pasta, Cherry tomatoes, Cucumber, Bell peppers, Carrots, Olives, Feta cheese, Pesto Dressing.", options: ["Bowl", "Jar"], img: "" },
+    { id: 8, name: "Chicken Pasta Salad سلطة باستا مع دجاج", category: "Salad", price: 2.75, desc: "Grilled Chicken Breast, Cucumber, Bell Pepper, Red Onion, Sweet Corn, Carrot, Parmesan Cheese, Pesto Dressing.", options: ["Bowl", "Jar"], img: "Chicken Pasta Salad.png" },
+    { id: 9, name: "Chicken Caesar Salad سلطة سيزر", category: "Salad", price: 2.75, desc: "Grilled chicken breast, Lettuce, Croton, Rocca, Parmesan cheese, Caesar dressing", options: ["Bowl", "Jar"], img: "Chicken Caesar Salad.png" },
+    { id: 10, name: "Mexican Chicken Salad سلطة مكسيكية", category: "Salad", price: 2.75, desc: "Grilled chicken breast, Toasted tortillas, Lettuce, Tomatoes, Corn, Black beans, Avocado, Olives, Cheddar cheese, Spicy Mayo Dressing", options: ["Bowl", "Jar"], img: "" },
+    { id: 11, name: "Tuna Salad سلطة تونا", category: "Salad", price: 2.25, desc: "Tuna, Iceberg lettuce, Rocca, Corn, Olives, Cucumber pickles, Radish pickles, White mushrooms, Sesame Soy Mustard Dressing", options: ["Bowl", "Jar"], img: "" },
+    { id: 12, name: "Crunchy Chicken Salad سلطة كرنشي", category: "Salad", price: 2.75, desc: "Crispy Chicken, Sweet Corn, Red cabbage, Cherry Tomatoes, Cucumber, Carrot, Lettuce, Rocca, Honey mustard Dressing.", options: ["Bowl", "Jar"], img: "" },
 
     // Sandwiches
-    { id: 13, name: "Cheese Sandwich ساندويش جبنة", category: "Sandwiches", price: 1.75, desc: "Emmental Cheese, Arugula, Tomato Slices, Cucumber, Red Onion, Pickles.", options: ["Whole Wheat", "White Bread"] },
-    { id: 14, name: "Pesto Halloumi Sandwich ساندويش بيستو مع حلوم", category: "Sandwiches", price: 1.75, desc: "Grilled Halloumi Cheese, Rocca Leaves, Tomatoes, Pesto Sauce.", options: ["Whole Wheat", "White Bread"] },
-    { id: 15, name: "Turkey Sandwich ساندويش تيركي", category: "Sandwiches", price: 1.75, desc: "Turkey, Cheddar Cheese, Lettuce, Pickles, Berry Mayo Sauce", options: ["Whole Wheat", "White Bread"] },
-    { id: 16, name: "Roast Beef Sandwich ساندويش روست بيف", category: "Sandwiches", price: 1.75, desc: "Roast Beef, Pickles, Fresh Lettuce, Cheddar Cheese, Honey Mustard Sauce.", options: ["Whole Wheat", "White Bread"] },
-    { id: 17, name: "Turkey & Roast Beef Sandwich ساندويش تيركي و روست بيف", category: "Sandwiches", price: 1.75, desc: "Turkey, Roast Beef, Pickles, Fresh Lettuce, Cheddar Cheese, Honey Mustard Sauce.", options: ["Whole Wheat", "White Bread"] },
-    { id: 18, name: "Club Sandwich ساندويش كلوب", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Turkey, Roast Beef, Light Mayo, Fresh Lettuce, Cheddar Cheese", options: ["Whole Wheat", "White Bread"] },
-    { id: 19, name: "Pepperoni Sandwich ساندويش ببروني", category: "Sandwiches", price: 2.25, desc: "Pepperoni, Roast Beef, Rocca Leaves, Tomatoes, Light Mayo, Mozzarella cheese.", options: ["Whole Wheat", "White Bread"] },
-    { id: 20, name: "Chicken Caesar Sandwich ساندويش سيزر", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Iceberg lettuce, Parmesan Cheese, Caesar Sauce.", options: ["Whole Wheat", "White Bread"] },
-    { id: 21, name: "Chicken Pesto Sandwich ساندويش دجاج بالبيستو", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Sundried tomatoes, Pesto Dressing, Rocca, Light Mayo and Mozzarella cheese.", options: ["Whole Wheat", "White Bread"] },
-    { id: 22, name: "Chicken Fajita Sandwich ساندويش فاهيتا", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Bell pepper, Onion, Dynamite Sauce, Cheddar Cheese.", options: ["Whole Wheat", "White Bread"] },
-    { id: 23, name: "Chicken Tandoori Sandwich ساندويش تندوري", category: "Sandwiches", price: 2.25, desc: "Chicken Breast, Lettuce, Tomato, Red Onion, Shredded Carrots, Fresh Cilantro, Tandoori Sauce.", options: ["Whole Wheat", "White Bread"] },
-    { id: 24, name: "Chicken Wrap راب دجاج", category: "Sandwiches", price: 2.25, desc: "Crispy Chicken, Cheddar Cheese, Lettuce, Pickles, Ranch Sauce.", options: ["Whole Wheat", "White Bread"] },
-    { id: 25, name: "Chicken Dynamite Wrap راب دجاج ديناميت", category: "Sandwiches", price: 2.25, desc: "Crispy Chicken, Cheddar Cheese, Lettuce, Pickles, Jalapeños, Spicy Ranch Sauce.", options: ["Whole Wheat", "White Bread"] },
-    { id: 26, name: "BBQ Chicken Wrap راب دجاج باربكيو", category: "Sandwiches", price: 2.25, desc: "Crispy Chicken, Cheddar Cheese, Lettuce, Smoked Turkey Bacon, Red Onion, Pickles, BBQ Sauce.", options: ["Whole Wheat", "White Bread"] },
-    { id: 27, name: "Tuna Sandwich ساندويش تونا", category: "Sandwiches", price: 2.00, desc: "Tuna, Rocca Leaves, Sweet Corn, Black Olives, Onion, Light Mayo, Lemon Slices.", options: ["Whole Wheat", "White Bread"] },
+    { id: 13, name: "Cheese Sandwich ساندويش جبنة", category: "Sandwiches", price: 1.75, desc: "Emmental Cheese, Arugula, Tomato Slices, Cucumber, Red Onion, Pickles.", options: ["Whole Wheat", "White Bread"], img: "Cheese Sandwich.jfif" },
+    { id: 14, name: "Pesto Halloumi Sandwich ساندويش بيستو مع حلوم", category: "Sandwiches", price: 1.75, desc: "Grilled Halloumi Cheese, Rocca Leaves, Tomatoes, Pesto Sauce.", options: ["Whole Wheat", "White Bread"], img: "" },
+    { id: 15, name: "Turkey Sandwich ساندويش تيركي", category: "Sandwiches", price: 1.75, desc: "Turkey, Cheddar Cheese, Lettuce, Pickles, Berry Mayo Sauce", options: ["Whole Wheat", "White Bread"], img: "" },
+    { id: 16, name: "Roast Beef Sandwich ساندويش روست بيف", category: "Sandwiches", price: 1.75, desc: "Roast Beef, Pickles, Fresh Lettuce, Cheddar Cheese, Honey Mustard Sauce.", options: ["Whole Wheat", "White Bread"], img: "" },
+    { id: 17, name: "Turkey & Roast Beef Sandwich ساندويش تيركي و روست بيف", category: "Sandwiches", price: 1.75, desc: "Turkey, Roast Beef, Pickles, Fresh Lettuce, Cheddar Cheese, Honey Mustard Sauce.", options: ["Whole Wheat", "White Bread"], img: "" },
+    { id: 18, name: "Club Sandwich ساندويش كلوب", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Turkey, Roast Beef, Light Mayo, Fresh Lettuce, Cheddar Cheese", options: ["Whole Wheat", "White Bread"], img: "Club Sandwich.png" },
+    { id: 19, name: "Pepperoni Sandwich ساندويش ببروني", category: "Sandwiches", price: 2.25, desc: "Pepperoni, Roast Beef, Rocca Leaves, Tomatoes, Light Mayo, Mozzarella cheese.", options: ["Whole Wheat", "White Bread"], img: "" },
+    { id: 20, name: "Chicken Caesar Sandwich ساندويش سيزر", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Iceberg lettuce, Parmesan Cheese, Caesar Sauce.", options: ["Whole Wheat", "White Bread"], img: "Chicken Caesar Sandwich.png" },
+    { id: 21, name: "Chicken Pesto Sandwich ساندويش دجاج بالبيستو", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Sundried tomatoes, Pesto Dressing, Rocca, Light Mayo and Mozzarella cheese.", options: ["Whole Wheat", "White Bread"], img: "Chicken Pesto Sandwich.png" },
+    { id: 22, name: "Chicken Fajita Sandwich ساندويش فاهيتا", category: "Sandwiches", price: 2.25, desc: "Grilled Chicken Breast, Bell pepper, Onion, Dynamite Sauce, Cheddar Cheese.", options: ["Whole Wheat", "White Bread"], img: "Chicken Fajita Sandwich.png" },
+    { id: 23, name: "Chicken Tandoori Sandwich ساندويش تندوري", category: "Sandwiches", price: 2.25, desc: "Chicken Breast, Lettuce, Tomato, Red Onion, Shredded Carrots, Fresh Cilantro, Tandoori Sauce.", options: ["Whole Wheat", "White Bread"], img: "Chicken Tandoori Sandwich.png" },
+    { id: 24, name: "Chicken Wrap راب دجاج", category: "Sandwiches", price: 2.25, desc: "Crispy Chicken, Cheddar Cheese, Lettuce, Pickles, Ranch Sauce.", options: ["Whole Wheat", "White Bread"], img: "Chicken Wrap.png" },
+    { id: 25, name: "Chicken Dynamite Wrap راب دجاج ديناميت", category: "Sandwiches", price: 2.25, desc: "Crispy Chicken, Cheddar Cheese, Lettuce, Pickles, Jalapeños, Spicy Ranch Sauce.", options: ["Whole Wheat", "White Bread"], img: "Chicken Dynamite Wrap.png" },
+    { id: 26, name: "BBQ Chicken Wrap راب دجاج باربكيو", category: "Sandwiches", price: 2.25, desc: "Crispy Chicken, Cheddar Cheese, Lettuce, Smoked Turkey Bacon, Red Onion, Pickles, BBQ Sauce.", options: ["Whole Wheat", "White Bread"], img: "BBQ Chicken Wrap.png" },
+    { id: 27, name: "Tuna Sandwich ساندويش تونا", category: "Sandwiches", price: 2.00, desc: "Tuna, Rocca Leaves, Sweet Corn, Black Olives, Onion, Light Mayo, Lemon Slices.", options: ["Whole Wheat", "White Bread"], img: "" },
 
     // Desserts
-    { id: 28, name: "Lazycake Balls ليزي كيك كرات", category: "Dessert", price: 1.75, desc: "", options: [] },
-    { id: 29, name: "Cheesecake تشيز كيك بارد", category: "Dessert", price: 1.75, desc: "", options: [] },
-    { id: 30, name: "Baked Cheesecake تشيز كيك مخبوز", category: "Dessert", price: 1.75, desc: "", options: [] },
-    { id: 31, name: "Brownies بروانيز", category: "Dessert", price: 1.75, desc: "", options: [] },
-    { id: 32, name: "Blondies بلوندي", category: "Dessert", price: 1.75, desc: "", options: [] },
-    { id: 33, name: "Muffin مافن", category: "Dessert", price: 1.50, desc: "", options: [] }
+    { id: 28, name: "Lazycake Balls ليزي كيك كرات", category: "Dessert", price: 1.75, desc: "", options: [], img: "" },
+    { id: 29, name: "Cheesecake تشيز كيك بارد", category: "Dessert", price: 1.75, desc: "", options: [], img: "Cheesecake.jfif" },
+    { id: 30, name: "Baked Cheesecake تشيز كيك مخبوز", category: "Dessert", price: 1.75, desc: "", options: [], img: "Baked Cheesecake.jfif" },
+    { id: 31, name: "Brownies بروانيز", category: "Dessert", price: 1.75, desc: "", options: [], img: "Brownies.jfif" },
+    { id: 32, name: "Blondies بلوندي", category: "Dessert", price: 1.75, desc: "", options: [], img: "Blondie .jfif" },
+    { id: 33, name: "Muffin مافن", category: "Dessert", price: 1.50, desc: "", options: [], img: "" }
   ];
 
   let cart = {}; // Stores { id: { qty, selectedOption } }
@@ -421,11 +421,14 @@
         `;
       }
 
+      // Proper img fallback handling
+      const imgSrc = p.img ? p.img : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="%23d1d5db"/></svg>';
+
       list.innerHTML += `
         <div class="product-card">
           <div class="product-main">
             <div class="product-info">
-              <div class="product-img"></div>
+              <img src="${imgSrc}" class="product-img" alt="${p.name}" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'><circle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23d1d5db\'/></svg>';">
               <div class="product-details">
                 <h3>${p.name}</h3>
                 ${p.desc ? `<p>${p.desc}</p>` : ''}
@@ -482,10 +485,12 @@
     return total;
   }
 
-  function filterCategory(cat) {
+  function filterCategory(cat, event) {
     activeCategory = cat;
     document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    if (event && event.target) {
+      event.target.classList.add('active');
+    }
     applyCurrentFilters();
   }
 
@@ -516,7 +521,6 @@
       return;
     }
 
-    // Build item summary line items
     let itemsSummary = [];
     for (let id in cart) {
       if (cart[id].qty > 0) {
@@ -536,18 +540,15 @@
       total: total.toFixed(2)
     };
 
-    // Google Apps Script Web App Endpoint URL
     const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
 
-    // Post to Google Sheet
     fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     }).then(() => {
-      // Direct WhatsApp redirect with formatted summary
-      const targetWhatsApp = "9627XXXXXXXX"; // Substitute target phone number
+      const targetWhatsApp = "9627XXXXXXXX";
       const waText = encodeURIComponent(
         `*NEW ORDER RECEIVED*\n` +
         `----------------------\n` +
@@ -569,86 +570,6 @@
 
   // Initial render
   renderProducts(products);
-<!-- Inside index.html near the bottom -->
-<script>
-<script>
-  const products = [
-    { id: 1, name: "Fusion Salad سلطة فيوجن", category: "Salads", price: 2.75, desc: "Lettuce, Rocca, Avocado, Cherry tomatoes, Corn, Green apple, Walnuts, Raisins, Date, Parmesan, Special Dressing", options: ["Bowl"], img: "Fusion Salad.png" },
-    { id: 2, name: "Rocca Salad سلطة جرجير", category: "Salads", price: 1.75, desc: "Rocca Leaves, Mushroom, Cherry Tomatoes and Parmesan Cheese, Citrus Balsamic Dressing.", options: ["Bowl"], img: "Rocca Salad.png" },
-    { id: 3, name: "Greek Salad سلطة يونانية", category: "Salads", price: 2.00, desc: "Feta cheese, Lettuce, Colored bell pepper, Cherry tomatoes, Cucumber, Olives, Greek Herb Vinaigrette Dressing.", options: ["Bowl"], img: "Greek Salad.png" },
-    { id: 4, name: "Grilled Halloumi Salad سلطة حلوم", category: "Salads", price: 2.25, desc: "Halloumi cheese, Lettuce, Rocca (Arugula), Bell pepper, Cherry tomatoes, Cucumber, Black Olive, Mayo Berry Dressing.", options: ["Bowl"], img: "Grilled Halloumi Salad.png" },
-    { id: 5, name: "Quinoa Salad سلطة كينوا", category: "Salads", price: 2.00, desc: "Spinach Leaves, Quinoa, Tomatoes and Pomegranate, Lemon Oil Dressing.", options: ["Bowl"], img: "Quinoa Salad.png" },
-    { id: 6, name: "Beetroot Salad سلطة شمندر", category: "Salads", price: 2.00, desc: "Beetroot, Orange, Green apple, Walnut, Mint, Feta cheese, Citrus Dressing.", options: ["Bowl"], img: "Beetroot Salad.png" },
-    { id: 7, name: "Chicken Caesar Salad سلطة قيصر دجاج", category: "Salads", price: 2.50, desc: "Grilled chicken, Lettuce, Parmesan, Croutons, Caesar Dressing.", options: ["Bowl"], img: "Chicken Caesar Salad.png" },
-    { id: 8, name: "Chicken Pasta Salad سلطة مكرونة بالدجاج", category: "Salads", price: 2.50, desc: "Pasta, Grilled chicken, Corn, Bell pepper, Olives, Creamy Dressing.", options: ["Bowl"], img: "Chicken Pasta Salad.png" },
-    { id: 9, name: "BBQ Chicken Wrap", category: "Sandwiches", price: 2.75, desc: "Grilled BBQ chicken, Lettuce, Cheddar cheese wrapped in tortilla.", options: ["Wrap"], img: "BBQ Chicken Wrap.png" },
-    { id: 10, name: "Chicken Caesar Sandwich", category: "Sandwiches", price: 2.50, desc: "Grilled chicken breast, Caesar sauce, Crisp lettuce.", options: ["Sandwich"], img: "Chicken Caesar Sandwich.png" },
-    { id: 11, name: "Chicken Dynamite Wrap", category: "Sandwiches", price: 2.75, desc: "Crispy chicken tossed in spicy dynamite sauce.", options: ["Wrap"], img: "Chicken Dynamite Wrap.png" },
-    { id: 12, name: "Chicken Fajita Sandwich", category: "Sandwiches", price: 2.50, desc: "Sautéed chicken strips, peppers, onions, fajita seasoning.", options: ["Sandwich"], img: "Chicken Fajita Sandwich.png" },
-    { id: 13, name: "Chicken Pesto Sandwich", category: "Sandwiches", price: 2.50, desc: "Grilled chicken with homemade basil pesto sauce.", options: ["Sandwich"], img: "Chicken Pesto Sandwich.png" },
-    { id: 14, name: "Chicken Tandoori Sandwich", category: "Sandwiches", price: 2.50, desc: "Spiced tandoori chicken with mint yogurt sauce.", options: ["Sandwich"], img: "Chicken Tandoori Sandwich.png" },
-    { id: 15, name: "Chicken Wrap", category: "Sandwiches", price: 2.50, desc: "Classic grilled chicken wrap with fresh greens.", options: ["Wrap"], img: "Chicken Wrap.png" },
-    { id: 16, name: "Club Sandwich", category: "Sandwiches", price: 2.75, desc: "Triple decker sandwich with chicken, egg, cheese, and lettuce.", options: ["Sandwich"], img: "Club Sandwich.png" },
-    { id: 17, name: "Cheese Sandwich", category: "Sandwiches", price: 1.50, desc: "Selected cheese blend toasted to perfection.", options: ["Sandwich"], img: "Cheese Sandwich.jfif" },
-    { id: 18, name: "Baked Cheesecake", category: "Desserts", price: 2.00, desc: "Classic rich and creamy baked cheesecake.", options: ["Piece"], img: "Baked Cheesecake.jfif" },
-    { id: 19, name: "Cheesecake", category: "Desserts", price: 2.00, desc: "Smooth strawberry topped cheesecake slice.", options: ["Piece"], img: "Cheesecake.jfif" },
-    { id: 20, name: "Brownies", category: "Desserts", price: 1.50, desc: "Rich chocolate brownie square.", options: ["Piece"], img: "Brownies.jfif" },
-    { id: 21, name: "Blondie", category: "Desserts", price: 1.50, desc: "Chewy vanilla blondie with white chocolate chips.", options: ["Piece"], img: "Blondie .jfif" }
-  ];
-
-  function renderProducts(filterCategory = 'All', searchQuery = '') {
-    const grid = document.getElementById('productGrid');
-    grid.innerHTML = '';
-
-    const filtered = products.filter(p => {
-      const matchCategory = filterCategory === 'All' || p.category.toLowerCase().includes(filterCategory.toLowerCase());
-      const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.desc.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchCategory && matchSearch;
-    });
-
-    document.getElementById('productCount').textContent = `Listing ${filtered.length} products`;
-
-    filtered.forEach(p => {
-      const card = document.createElement('div');
-      card.className = 'product-card';
-      
-      const optionsHTML = p.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
-
-      card.innerHTML = `
-        <img src="${p.img}" class="product-img" alt="${p.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/100?text=No+Image';">
-        <div class="product-info">
-          <div class="product-header">
-            <span class="product-title">${p.name}</span>
-            <span class="product-price">JOD ${p.price.toFixed(2)}<br><small style="font-weight:normal; font-size:10px; color:#888;">Unit</small></span>
-          </div>
-          <div class="product-desc">${p.desc}</div>
-          <div class="product-actions">
-            <div>
-              <span style="font-size: 11px; color: #666;">Select Choice:</span>
-              <select class="choice-select">${optionsHTML}</select>
-            </div>
-            <div class="qty-control">
-              <button class="qty-btn" onclick="updateQty(this, -1)">-</button>
-              <span class="qty-val">0</span>
-              <button class="qty-btn" onclick="updateQty(this, 1)">+</button>
-            </div>
-          </div>
-        </div>
-      `;
-      grid.appendChild(card);
-    });
-  }
-
-  function updateQty(btn, change) {
-    const qtySpan = btn.parentElement.querySelector('.qty-val');
-    let currentQty = parseInt(qtySpan.textContent);
-    currentQty = Math.max(0, currentQty + change);
-    qtySpan.textContent = currentQty;
-  }
-
-  // Initial Render
-  renderProducts();
-</script>
 </script>
 </body>
 </html>
