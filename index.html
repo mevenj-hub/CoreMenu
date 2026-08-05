@@ -148,6 +148,7 @@
       object-fit: cover;
       background: #d1d5db;
       flex-shrink: 0;
+      cursor: pointer;
     }
 
     .product-details {
@@ -276,6 +277,46 @@
       cursor: pointer;
       margin-top: 10px;
     }
+
+    /* Modals Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+
+    .modal-content-img {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: -35px;
+      right: 0;
+      color: #ffffff;
+      font-size: 32px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 18px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
@@ -349,8 +390,29 @@
   </div>
 </div>
 
+<!-- Image Preview Modal -->
+<div id="imageModal" class="modal-overlay" style="display: none;" onclick="closeImageModal()">
+  <div class="modal-content-img" onclick="event.stopPropagation()">
+    <span class="close-btn" onclick="closeImageModal()">&times;</span>
+    <img id="modalImage" src="" alt="Product Preview" style="max-width: 85vw; max-height: 75vh; border-radius: 12px; object-fit: contain; background: #fff;" />
+  </div>
+</div>
+
+<!-- Order Summary & Confirmation Modal -->
+<div id="confirmModal" class="modal-overlay" style="display: none;">
+  <div class="modal-box">
+    <h3 style="margin-top: 0; font-size: 18px; text-align: center;">Confirm Your Order</h3>
+    <div id="confirmDetails" style="max-height: 250px; overflow-y: auto; margin: 15px 0; background: #f9f9f9; padding: 12px; border-radius: 10px; font-size: 13px; line-height: 1.5;"></div>
+    
+    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
+      <button type="button" onclick="closeConfirmModal()" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #ccc; background: #ffffff; cursor: pointer; font-weight: 600;">Edit Order</button>
+      <button type="button" onclick="executeFinalOrder()" style="flex: 1; padding: 10px; border-radius: 10px; border: none; background: #000000; color: #ffffff; cursor: pointer; font-weight: bold;">Proceed</button>
+    </div>
+  </div>
+</div>
+
 <script>
-  // Complete Dataset cleaned from line break syntax errors
+  // Complete Dataset
   const products = [
     // Salads
     { id: 1, name: "Fusion Salad سلطة فيوجن", category: "Salad", price: 2.75, desc: "Lettuce, Rocca, Avocado, Cherry tomatoes, Corn, Green apple, Walnuts, Raisins, Date, Parmesan, Special Dressing", options: ["Bowl", "Jar"], img: "Fusion Salad.png" },
@@ -392,8 +454,9 @@
     { id: 33, name: "Muffin مافن", category: "Dessert", price: 1.50, desc: "", options: [], img: "Muffin.jfif" }
   ];
 
-  let cart = {}; // Stores { id: { qty, selectedOption } }
+  let cart = {}; // Stores { id: { qty, option } }
   let activeCategory = 'All';
+  let pendingPayload = null; // Stores payload for confirmation modal
 
   // Set min date to tomorrow
   const dateInput = document.getElementById('receivingDate');
@@ -407,7 +470,7 @@
     document.getElementById('product-count').innerText = `Listing ${items.length} products`;
 
     items.forEach(p => {
-      const cartItem = cart[p.id] || { qty: 0, option: p.options ? p.options[0] : '' };
+      const cartItem = cart[p.id] || { qty: 0, option: p.options && p.options.length > 0 ? p.options[0] : '' };
       
       let optionsHTML = '';
       if (p.options && p.options.length > 0) {
@@ -422,7 +485,7 @@
       }
 
       const imgHTML = p.img 
-        ? `<img src="${p.img}" class="product-img" alt="${p.name}">`
+        ? `<img src="${p.img}" class="product-img" alt="${p.name}" onclick="openImageModal('${p.img}')">`
         : `<div class="product-img"></div>`;
 
       list.innerHTML += `
@@ -505,7 +568,6 @@
 
     if (activeCategory !== 'All') {
       filtered = filtered.filter(p => {
-        // Flexible category matching for "Salad/Salads", "Sandwiches", "Dessert/Desserts"
         const cleanCategory = activeCategory.toLowerCase().replace(/s$/, '');
         return p.category.toLowerCase().includes(cleanCategory);
       });
@@ -518,6 +580,19 @@
     renderProducts(filtered);
   }
 
+  /* Image Preview Modal Logic */
+  function openImageModal(imgSrc) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    modalImg.src = imgSrc;
+    modal.style.display = 'flex';
+  }
+
+  function closeImageModal() {
+    document.getElementById('imageModal').style.display = 'none';
+  }
+
+  /* Submission & Order Review Modal Logic */
   function handleOrderSubmit(e) {
     e.preventDefault();
     const total = calculateTotal();
@@ -535,7 +610,7 @@
       }
     }
 
-    const payload = {
+    pendingPayload = {
       name: document.getElementById('fullName').value,
       phone: document.getElementById('phone').value,
       date: document.getElementById('receivingDate').value,
@@ -545,25 +620,49 @@
       total: total.toFixed(2)
     };
 
+    // Format HTML for the review popup modal
+    const summaryHTML = `
+      <strong>Customer Name:</strong> ${pendingPayload.name}<br>
+      <strong>Phone:</strong> ${pendingPayload.phone}<br>
+      <strong>Receiving Date:</strong> ${pendingPayload.date}<br>
+      <strong>Address:</strong> ${pendingPayload.address}<br>
+      <strong>Payment Method:</strong> ${pendingPayload.payment}<br><hr style="border:0; border-top:1px dashed #ccc; margin:8px 0;">
+      <strong>Order Items:</strong><br>${itemsSummary.join('<br>')}<br><hr style="border:0; border-top:1px dashed #ccc; margin:8px 0;">
+      <strong style="font-size: 14px;">Total Amount: JOD ${pendingPayload.total}</strong>
+    `;
+
+    document.getElementById('confirmDetails').innerHTML = summaryHTML;
+    document.getElementById('confirmModal').style.display = 'flex';
+  }
+
+  function closeConfirmModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+  }
+
+  function executeFinalOrder() {
+    if (!pendingPayload) return;
+
+    closeConfirmModal();
+
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsBp2atinFu55eKty5xNbrsmyPH0Tty9pOLQWoC8WMZROPvjNucwHezS9mhLVhoDGp/exec";
+    const targetWhatsApp = "962780100050";
 
     fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(pendingPayload)
     }).then(() => {
-      const targetWhatsApp = "962780100050";
       const waText = encodeURIComponent(
         `*NEW ORDER RECEIVED*\n` +
         `----------------------\n` +
-        `*Customer Name:* ${payload.name}\n` +
-        `*Phone:* ${payload.phone}\n` +
-        `*Receiving Date:* ${payload.date}\n` +
-        `*Address:* ${payload.address}\n` +
-        `*Payment Method:* ${payload.payment}\n\n` +
-        `*Order Items:*\n${payload.items}\n\n` +
-        `*Total Amount:* JOD ${payload.total}`
+        `*Customer Name:* ${pendingPayload.name}\n` +
+        `*Phone:* ${pendingPayload.phone}\n` +
+        `*Receiving Date:* ${pendingPayload.date}\n` +
+        `*Address:* ${pendingPayload.address}\n` +
+        `*Payment Method:* ${pendingPayload.payment}\n\n` +
+        `*Order Items:*\n${pendingPayload.items}\n\n` +
+        `*Total Amount:* JOD ${pendingPayload.total}`
       );
 
       alert("Order submitted successfully!");
