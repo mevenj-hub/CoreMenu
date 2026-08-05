@@ -571,16 +571,84 @@
   renderProducts(products);
 <!-- Inside index.html near the bottom -->
 <script>
+<script>
   const products = [
-    { id: 1, name: "Fusion Salad سلطة فيوجن", category: "Salad", price: 2.75, desc: "Lettuce, Rocca, Avocado...", options: ["Bowl", "Jar"], img: "Fusion Salad.png" },
-    { id: 2, name: "Rocca Salad سلطة جرجير", category: "Salad", price: 1.75, desc: "Rocca Leaves, Mushroom...", options: ["Bowl", "Jar"], img: "Rocca Salad.png" },
-    { id: 3, name: "Greek Salad سلطة يونانية", category: "Salad", price: 2.00, desc: "Feta cheese, Lettuce...", options: ["Bowl", "Jar"], img: "Greek Salad.png" },
-    { id: 4, name: "Grilled Halloumi Salad سلطة حلوم", category: "Salad", price: 2.25, desc: "Halloumi cheese, Lettuce...", options: ["Bowl", "Jar"], img: "Grilled Halloumi Salad.png" },
-    { id: 5, name: "Quinoa Salad سلطة كينوا", category: "Salad", price: 2.00, desc: "Spinach Leaves, Quinoa...", options: ["Bowl", "Jar"], img: "Quinoa Salad.png" }
-    // ... update the remaining items matching your filenames
+    { id: 1, name: "Fusion Salad سلطة فيوجن", category: "Salads", price: 2.75, desc: "Lettuce, Rocca, Avocado, Cherry tomatoes, Corn, Green apple, Walnuts, Raisins, Date, Parmesan, Special Dressing", options: ["Bowl"], img: "Fusion Salad.png" },
+    { id: 2, name: "Rocca Salad سلطة جرجير", category: "Salads", price: 1.75, desc: "Rocca Leaves, Mushroom, Cherry Tomatoes and Parmesan Cheese, Citrus Balsamic Dressing.", options: ["Bowl"], img: "Rocca Salad.png" },
+    { id: 3, name: "Greek Salad سلطة يونانية", category: "Salads", price: 2.00, desc: "Feta cheese, Lettuce, Colored bell pepper, Cherry tomatoes, Cucumber, Olives, Greek Herb Vinaigrette Dressing.", options: ["Bowl"], img: "Greek Salad.png" },
+    { id: 4, name: "Grilled Halloumi Salad سلطة حلوم", category: "Salads", price: 2.25, desc: "Halloumi cheese, Lettuce, Rocca (Arugula), Bell pepper, Cherry tomatoes, Cucumber, Black Olive, Mayo Berry Dressing.", options: ["Bowl"], img: "Grilled Halloumi Salad.png" },
+    { id: 5, name: "Quinoa Salad سلطة كينوا", category: "Salads", price: 2.00, desc: "Spinach Leaves, Quinoa, Tomatoes and Pomegranate, Lemon Oil Dressing.", options: ["Bowl"], img: "Quinoa Salad.png" },
+    { id: 6, name: "Beetroot Salad سلطة شمندر", category: "Salads", price: 2.00, desc: "Beetroot, Orange, Green apple, Walnut, Mint, Feta cheese, Citrus Dressing.", options: ["Bowl"], img: "Beetroot Salad.png" },
+    { id: 7, name: "Chicken Caesar Salad سلطة قيصر دجاج", category: "Salads", price: 2.50, desc: "Grilled chicken, Lettuce, Parmesan, Croutons, Caesar Dressing.", options: ["Bowl"], img: "Chicken Caesar Salad.png" },
+    { id: 8, name: "Chicken Pasta Salad سلطة مكرونة بالدجاج", category: "Salads", price: 2.50, desc: "Pasta, Grilled chicken, Corn, Bell pepper, Olives, Creamy Dressing.", options: ["Bowl"], img: "Chicken Pasta Salad.png" },
+    { id: 9, name: "BBQ Chicken Wrap", category: "Sandwiches", price: 2.75, desc: "Grilled BBQ chicken, Lettuce, Cheddar cheese wrapped in tortilla.", options: ["Wrap"], img: "BBQ Chicken Wrap.png" },
+    { id: 10, name: "Chicken Caesar Sandwich", category: "Sandwiches", price: 2.50, desc: "Grilled chicken breast, Caesar sauce, Crisp lettuce.", options: ["Sandwich"], img: "Chicken Caesar Sandwich.png" },
+    { id: 11, name: "Chicken Dynamite Wrap", category: "Sandwiches", price: 2.75, desc: "Crispy chicken tossed in spicy dynamite sauce.", options: ["Wrap"], img: "Chicken Dynamite Wrap.png" },
+    { id: 12, name: "Chicken Fajita Sandwich", category: "Sandwiches", price: 2.50, desc: "Sautéed chicken strips, peppers, onions, fajita seasoning.", options: ["Sandwich"], img: "Chicken Fajita Sandwich.png" },
+    { id: 13, name: "Chicken Pesto Sandwich", category: "Sandwiches", price: 2.50, desc: "Grilled chicken with homemade basil pesto sauce.", options: ["Sandwich"], img: "Chicken Pesto Sandwich.png" },
+    { id: 14, name: "Chicken Tandoori Sandwich", category: "Sandwiches", price: 2.50, desc: "Spiced tandoori chicken with mint yogurt sauce.", options: ["Sandwich"], img: "Chicken Tandoori Sandwich.png" },
+    { id: 15, name: "Chicken Wrap", category: "Sandwiches", price: 2.50, desc: "Classic grilled chicken wrap with fresh greens.", options: ["Wrap"], img: "Chicken Wrap.png" },
+    { id: 16, name: "Club Sandwich", category: "Sandwiches", price: 2.75, desc: "Triple decker sandwich with chicken, egg, cheese, and lettuce.", options: ["Sandwich"], img: "Club Sandwich.png" },
+    { id: 17, name: "Cheese Sandwich", category: "Sandwiches", price: 1.50, desc: "Selected cheese blend toasted to perfection.", options: ["Sandwich"], img: "Cheese Sandwich.jfif" },
+    { id: 18, name: "Baked Cheesecake", category: "Desserts", price: 2.00, desc: "Classic rich and creamy baked cheesecake.", options: ["Piece"], img: "Baked Cheesecake.jfif" },
+    { id: 19, name: "Cheesecake", category: "Desserts", price: 2.00, desc: "Smooth strawberry topped cheesecake slice.", options: ["Piece"], img: "Cheesecake.jfif" },
+    { id: 20, name: "Brownies", category: "Desserts", price: 1.50, desc: "Rich chocolate brownie square.", options: ["Piece"], img: "Brownies.jfif" },
+    { id: 21, name: "Blondie", category: "Desserts", price: 1.50, desc: "Chewy vanilla blondie with white chocolate chips.", options: ["Piece"], img: "Blondie .jfif" }
   ];
 
-  // ... rest of your code ...
+  function renderProducts(filterCategory = 'All', searchQuery = '') {
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = '';
+
+    const filtered = products.filter(p => {
+      const matchCategory = filterCategory === 'All' || p.category.toLowerCase().includes(filterCategory.toLowerCase());
+      const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.desc.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchCategory && matchSearch;
+    });
+
+    document.getElementById('productCount').textContent = `Listing ${filtered.length} products`;
+
+    filtered.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      
+      const optionsHTML = p.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+
+      card.innerHTML = `
+        <img src="${p.img}" class="product-img" alt="${p.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/100?text=No+Image';">
+        <div class="product-info">
+          <div class="product-header">
+            <span class="product-title">${p.name}</span>
+            <span class="product-price">JOD ${p.price.toFixed(2)}<br><small style="font-weight:normal; font-size:10px; color:#888;">Unit</small></span>
+          </div>
+          <div class="product-desc">${p.desc}</div>
+          <div class="product-actions">
+            <div>
+              <span style="font-size: 11px; color: #666;">Select Choice:</span>
+              <select class="choice-select">${optionsHTML}</select>
+            </div>
+            <div class="qty-control">
+              <button class="qty-btn" onclick="updateQty(this, -1)">-</button>
+              <span class="qty-val">0</span>
+              <button class="qty-btn" onclick="updateQty(this, 1)">+</button>
+            </div>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function updateQty(btn, change) {
+    const qtySpan = btn.parentElement.querySelector('.qty-val');
+    let currentQty = parseInt(qtySpan.textContent);
+    currentQty = Math.max(0, currentQty + change);
+    qtySpan.textContent = currentQty;
+  }
+
+  // Initial Render
+  renderProducts();
+</script>
 </script>
 </body>
 </html>
