@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Orders - Online Ordering Portal</title>
+  <title> Core Orders - Online Ordering Portal</title>
   <style>
     :root {
       --bg-color: #ffffff;
@@ -324,7 +324,7 @@
 <div class="container">
   <!-- Brand Header -->
   <div class="logo-box">CORE</div>
-  <h1>Orders</h1>
+  <h1>Menu Core</h1>
   <div class="divider"></div>
 
   <!-- Categories -->
@@ -405,8 +405,8 @@
     <div id="confirmDetails" style="max-height: 250px; overflow-y: auto; margin: 15px 0; background: #f9f9f9; padding: 12px; border-radius: 10px; font-size: 13px; line-height: 1.5;"></div>
     
     <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
-      <button type="button" onclick="closeConfirmModal()" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #ccc; background: #ffffff; cursor: pointer; font-weight: 600;">Edit Order</button>
-      <button type="button" onclick="executeFinalOrder()" style="flex: 1; padding: 10px; border-radius: 10px; border: none; background: #000000; color: #ffffff; cursor: pointer; font-weight: bold;">Proceed</button>
+      <button type="button" id="editBtn" onclick="closeConfirmModal()" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #ccc; background: #ffffff; cursor: pointer; font-weight: 600;">Edit Order</button>
+      <button type="button" id="confirmBtn" onclick="executeFinalOrder()" style="flex: 1; padding: 10px; border-radius: 10px; border: none; background: #000000; color: #ffffff; cursor: pointer; font-weight: bold;">Proceed</button>
     </div>
   </div>
 </div>
@@ -456,7 +456,7 @@
 
   let cart = {}; // Stores { id: { qty, option } }
   let activeCategory = 'All';
-  let pendingPayload = null; // Stores payload for confirmation modal
+  let pendingPayload = null;
 
   // Set min date to tomorrow
   const dateInput = document.getElementById('receivingDate');
@@ -601,12 +601,19 @@
       return;
     }
 
-    let itemsSummary = [];
+    let itemsList = [];
+    let itemsTextArr = [];
     for (let id in cart) {
       if (cart[id].qty > 0) {
         const item = products.find(p => p.id == id);
+        itemsList.push({
+          name: item.name,
+          price: item.price,
+          qty: cart[id].qty,
+          option: cart[id].option || ''
+        });
         const optText = cart[id].option ? ` (${cart[id].option})` : '';
-        itemsSummary.push(`${item.name}${optText} x${cart[id].qty}`);
+        itemsTextArr.push(`${item.name}${optText} x${cart[id].qty}`);
       }
     }
 
@@ -616,18 +623,18 @@
       date: document.getElementById('receivingDate').value,
       address: document.getElementById('address').value,
       payment: document.getElementById('paymentMethod').value,
-      items: itemsSummary.join('\n'),
+      itemsList: itemsList,
+      itemsText: itemsTextArr.join('\n'),
       total: total.toFixed(2)
     };
 
-    // Format HTML for the review popup modal
     const summaryHTML = `
       <strong>Customer Name:</strong> ${pendingPayload.name}<br>
       <strong>Phone:</strong> ${pendingPayload.phone}<br>
       <strong>Receiving Date:</strong> ${pendingPayload.date}<br>
       <strong>Address:</strong> ${pendingPayload.address}<br>
       <strong>Payment Method:</strong> ${pendingPayload.payment}<br><hr style="border:0; border-top:1px dashed #ccc; margin:8px 0;">
-      <strong>Order Items:</strong><br>${itemsSummary.join('<br>')}<br><hr style="border:0; border-top:1px dashed #ccc; margin:8px 0;">
+      <strong>Order Items:</strong><br>${itemsTextArr.join('<br>')}<br><hr style="border:0; border-top:1px dashed #ccc; margin:8px 0;">
       <strong style="font-size: 14px;">Total Amount: JOD ${pendingPayload.total}</strong>
     `;
 
@@ -639,20 +646,31 @@
     document.getElementById('confirmModal').style.display = 'none';
   }
 
-  function executeFinalOrder() {
+  async function executeFinalOrder() {
     if (!pendingPayload) return;
 
-    closeConfirmModal();
+    const confirmBtn = document.getElementById('confirmBtn');
+    confirmBtn.innerText = "Generating PDF...";
+    confirmBtn.disabled = true;
 
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsBp2atinFu55eKty5xNbrsmyPH0Tty9pOLQWoC8WMZROPvjNucwHezS9mhLVhoDGp/exec";
     const targetWhatsApp = "962780100050";
 
-    fetch(GOOGLE_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(pendingPayload)
-    }).then(() => {
+    try {
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' }, // Avoid CORS pre-flight block
+        body: JSON.stringify(pendingPayload)
+      });
+      
+      const result = await response.json();
+      closeConfirmModal();
+
+      let pdfLinkText = "";
+      if (result.pdfUrl) {
+        pdfLinkText = `\n\n📄 *Download PDF Invoice:* ${result.pdfUrl}`;
+      }
+
       const waText = encodeURIComponent(
         `*NEW ORDER RECEIVED*\n` +
         `----------------------\n` +
@@ -661,15 +679,18 @@
         `*Receiving Date:* ${pendingPayload.date}\n` +
         `*Address:* ${pendingPayload.address}\n` +
         `*Payment Method:* ${pendingPayload.payment}\n\n` +
-        `*Order Items:*\n${pendingPayload.items}\n\n` +
-        `*Total Amount:* JOD ${pendingPayload.total}`
+        `*Order Items:*\n${pendingPayload.itemsText}\n\n` +
+        `*Total Amount:* JOD ${pendingPayload.total}` +
+        pdfLinkText
       );
 
-      alert("Order submitted successfully!");
       window.open(`https://wa.me/${targetWhatsApp}?text=${waText}`, '_blank');
-    }).catch(err => {
+    } catch (err) {
       alert("Submission error: " + err);
-    });
+    } finally {
+      confirmBtn.innerText = "Proceed";
+      confirmBtn.disabled = false;
+    }
   }
 
   // Initial render
