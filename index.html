@@ -646,53 +646,70 @@
     document.getElementById('confirmModal').style.display = 'none';
   }
 
-  async function executeFinalOrder() {
-    if (!pendingPayload) return;
+async function executeFinalOrder() {
+  if (!pendingPayload) return;
 
-    const confirmBtn = document.getElementById('confirmBtn');
-    confirmBtn.innerText = "Generating PDF...";
-    confirmBtn.disabled = true;
+  const confirmBtn = document.getElementById('confirmBtn');
+  confirmBtn.innerText = "Generating PDF...";
+  confirmBtn.disabled = true;
 
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsBp2atinFu55eKty5xNbrsmyPH0Tty9pOLQWoC8WMZROPvjNucwHezS9mhLVhoDGp/exec";
-    const targetWhatsApp = "962780100050";
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsBp2atinFu55eKty5xNbrsmyPH0Tty9pOLQWoC8WMZROPvjNucwHezS9mhLVhoDGp/exec";
+  const targetWhatsApp = "962780100050";
 
+  let pdfUrl = "";
+
+  try {
+    // Primary request attempt
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(pendingPayload)
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      if (result && result.pdfUrl) {
+        pdfUrl = result.pdfUrl;
+      }
+    }
+  } catch (err) {
+    console.warn("Standard fetch restricted by CORS/Redirect, submitting with fallback...", err);
+    
+    // Fallback attempt with mode: 'no-cors' to ensure data reaches Google Apps Script
     try {
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
+      await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' }, // Avoid CORS pre-flight block
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify(pendingPayload)
       });
-      
-      const result = await response.json();
-      closeConfirmModal();
-
-      let pdfLinkText = "";
-      if (result.pdfUrl) {
-        pdfLinkText = `\n\n📄 *Download PDF Invoice:* ${result.pdfUrl}`;
-      }
-
-      const waText = encodeURIComponent(
-        `*NEW ORDER RECEIVED*\n` +
-        `----------------------\n` +
-        `*Customer Name:* ${pendingPayload.name}\n` +
-        `*Phone:* ${pendingPayload.phone}\n` +
-        `*Receiving Date:* ${pendingPayload.date}\n` +
-        `*Address:* ${pendingPayload.address}\n` +
-        `*Payment Method:* ${pendingPayload.payment}\n\n` +
-        `*Order Items:*\n${pendingPayload.itemsText}\n\n` +
-        `*Total Amount:* JOD ${pendingPayload.total}` +
-        pdfLinkText
-      );
-
-      window.open(`https://wa.me/${targetWhatsApp}?text=${waText}`, '_blank');
-    } catch (err) {
-      alert("Submission error: " + err);
-    } finally {
-      confirmBtn.innerText = "Proceed";
-      confirmBtn.disabled = false;
+    } catch (fallbackErr) {
+      console.error("Fallback submission error:", fallbackErr);
     }
-  }
+  } finally {
+    closeConfirmModal();
 
+    let pdfLinkText = pdfUrl ? `\n\n📄 *Download PDF Invoice:* ${pdfUrl}` : "";
+
+    const waText = encodeURIComponent(
+      `*NEW ORDER RECEIVED*\n` +
+      `----------------------\n` +
+      `*Customer Name:* ${pendingPayload.name}\n` +
+      `*Phone:* ${pendingPayload.phone}\n` +
+      `*Receiving Date:* ${pendingPayload.date}\n` +
+      `*Address:* ${pendingPayload.address}\n` +
+      `*Payment Method:* ${pendingPayload.payment}\n\n` +
+      `*Order Items:*\n${pendingPayload.itemsText}\n\n` +
+      `*Total Amount:* JOD ${pendingPayload.total}` +
+      pdfLinkText
+    );
+
+    window.open(`https://wa.me/${targetWhatsApp}?text=${waText}`, '_blank');
+
+    confirmBtn.innerText = "Proceed";
+    confirmBtn.disabled = false;
+  }
+}
   // Initial render
   renderProducts(products);
 </script>
