@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> Core Orders - Online Ordering Portal</title>
+  <title>Core Orders - Online Ordering Portal</title>
   <style>
     :root {
       --bg-color: #ffffff;
@@ -315,7 +315,7 @@
       border-radius: 18px;
       max-width: 400px;
       width: 90%;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     }
   </style>
 </head>
@@ -342,15 +342,12 @@
   </div>
 
   <!-- Product List -->
-  <div class="product-list" id="product-list">
-    <!-- Rendered via JS -->
-  </div>
+  <div class="product-list" id="product-list"></div>
 
   <!-- Checkout Form -->
   <div class="checkout-section">
     <h2>Checkout Details</h2>
     <form id="orderForm" onsubmit="handleOrderSubmit(event)">
-      
       <div class="form-group">
         <label for="fullName">Full Name *</label>
         <input type="text" id="fullName" required placeholder="Enter your full name">
@@ -412,7 +409,6 @@
 </div>
 
 <script>
-  // Complete Dataset
   const products = [
     // Salads
     { id: 1, name: "Fusion Salad سلطة فيوجن", category: "Salad", price: 2.75, desc: "Lettuce, Rocca, Avocado, Cherry tomatoes, Corn, Green apple, Walnuts, Raisins, Date, Parmesan, Special Dressing", options: ["Bowl", "Jar"], img: "Fusion Salad.png" },
@@ -454,7 +450,7 @@
     { id: 33, name: "Muffin مافن", category: "Dessert", price: 1.50, desc: "", options: [], img: "Muffin.jfif" }
   ];
 
-  let cart = {}; // Stores { id: { qty, option } }
+  let cart = {};
   let activeCategory = 'All';
   let pendingPayload = null;
 
@@ -580,7 +576,6 @@
     renderProducts(filtered);
   }
 
-  /* Image Preview Modal Logic */
   function openImageModal(imgSrc) {
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
@@ -592,7 +587,6 @@
     document.getElementById('imageModal').style.display = 'none';
   }
 
-  /* Submission & Order Review Modal Logic */
   function handleOrderSubmit(e) {
     e.preventDefault();
     const total = calculateTotal();
@@ -646,70 +640,79 @@
     document.getElementById('confirmModal').style.display = 'none';
   }
 
-async function executeFinalOrder() {
-  if (!pendingPayload) return;
+  async function executeFinalOrder() {
+    if (!pendingPayload) return;
 
-  const confirmBtn = document.getElementById('confirmBtn');
-  confirmBtn.innerText = "Generating PDF...";
-  confirmBtn.disabled = true;
+    const confirmBtn = document.getElementById('confirmBtn');
+    confirmBtn.innerText = "Generating PDF...";
+    confirmBtn.disabled = true;
 
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCY04lSBq6HQClRXIJc-rfuSFNSikCXq0_yc5cTk2rA57WwuJOTjRXlD411kk_9rhB/exec";
-  const targetWhatsApp = "00962 7 9709 6976";
-
-  let pdfUrl = "";
-
-  try {
-    // Primary request attempt
-    const response = await fetch(GOOGLE_SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(pendingPayload)
-    });
-
-    if (response.ok) {
-      const result = await response.json();
-      if (result && result.pdfUrl) {
-        pdfUrl = result.pdfUrl;
-      }
-    }
-  } catch (err) {
-    console.warn("Standard fetch restricted by CORS/Redirect, submitting with fallback...", err);
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCY04lSBq6HQClRXIJc-rfuSFNSikCXq0_yc5cTk2rA57WwuJOTjRXlD411kk_9rhB/exec";
     
-    // Fallback attempt with mode: 'no-cors' to ensure data reaches Google Apps Script
+    // Strict format: Only country code + digits, no leading 00, no spaces, no +
+    const targetWhatsApp = "962797096976";
+
+    let pdfUrl = "";
+
     try {
-      await fetch(GOOGLE_SCRIPT_URL, {
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(pendingPayload)
       });
-    } catch (fallbackErr) {
-      console.error("Fallback submission error:", fallbackErr);
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result && result.pdfUrl) {
+          pdfUrl = result.pdfUrl;
+        }
+      }
+    } catch (err) {
+      console.warn("Primary fetch restricted, submitting via fallback...", err);
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(pendingPayload)
+        });
+      } catch (fallbackErr) {
+        console.error("Fallback submission error:", fallbackErr);
+      }
+    } finally {
+      closeConfirmModal();
+
+      let pdfLinkText = pdfUrl ? `\n\n📄 *Download PDF Invoice:* ${pdfUrl}` : "";
+
+      const waText = encodeURIComponent(
+        `*NEW ORDER RECEIVED*\n` +
+        `----------------------\n` +
+        `*Customer Name:* ${pendingPayload.name}\n` +
+        `*Phone:* ${pendingPayload.phone}\n` +
+        `*Receiving Date:* ${pendingPayload.date}\n` +
+        `*Address:* ${pendingPayload.address}\n` +
+        `*Payment Method:* ${pendingPayload.payment}\n\n` +
+        `*Order Items:*\n${pendingPayload.itemsText}\n\n` +
+        `*Total Amount:* JOD ${pendingPayload.total}` +
+        pdfLinkText
+      );
+
+      // Clean digits strictly
+      const cleanPhone = targetWhatsApp.replace(/\D/g, '');
+      
+      // Route between mobile app and desktop WhatsApp web
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const waUrl = isMobile 
+        ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${waText}`
+        : `https://web.whatsapp.com/send?phone=${cleanPhone}&text=${waText}`;
+
+      window.open(waUrl, '_blank');
+
+      confirmBtn.innerText = "Proceed";
+      confirmBtn.disabled = false;
     }
-  } finally {
-    closeConfirmModal();
-
-    let pdfLinkText = pdfUrl ? `\n\n📄 *Download PDF Invoice:* ${pdfUrl}` : "";
-
-    const waText = encodeURIComponent(
-      `*NEW ORDER RECEIVED*\n` +
-      `----------------------\n` +
-      `*Customer Name:* ${pendingPayload.name}\n` +
-      `*Phone:* ${pendingPayload.phone}\n` +
-      `*Receiving Date:* ${pendingPayload.date}\n` +
-      `*Address:* ${pendingPayload.address}\n` +
-      `*Payment Method:* ${pendingPayload.payment}\n\n` +
-      `*Order Items:*\n${pendingPayload.itemsText}\n\n` +
-      `*Total Amount:* JOD ${pendingPayload.total}` +
-      pdfLinkText
-    );
-
-    window.open(`https://wa.me/${targetWhatsApp}?text=${waText}`, '_blank');
-
-    confirmBtn.innerText = "Proceed";
-    confirmBtn.disabled = false;
   }
-}
+
   // Initial render
   renderProducts(products);
 </script>
