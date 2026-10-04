@@ -90,7 +90,7 @@
       color: #ffffff;
     }
 
-    /* Toolbar / Search */
+    /* Toolbar / Search & View Toggle */
     .toolbar {
       width: 100%;
       background: var(--card-bg);
@@ -101,22 +101,57 @@
       justify-content: space-between;
       margin-bottom: 15px;
       box-sizing: border-box;
+      gap: 8px;
     }
 
     .search-input {
       border: none;
       background: transparent;
       outline: none;
-      width: 55%;
+      flex: 1;
       font-size: 13px;
     }
 
-    /* Product Cards */
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 3px;
+    }
+
+    .toggle-btn {
+      border: none;
+      background: transparent;
+      padding: 4px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+
+    .toggle-btn.active {
+      background: var(--accent-black);
+      color: #ffffff;
+    }
+
+    /* Product List Views */
     .product-list {
       width: 100%;
       display: flex;
       flex-direction: column;
       gap: 12px;
+    }
+
+    /* Grid Layout View */
+    .product-list.grid-view {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
 
     .product-card {
@@ -126,22 +161,24 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+      box-sizing: border-box;
     }
 
-    .product-main {
+    /* List Item View Layout */
+    .product-list:not(.grid-view) .product-main {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
-    .product-info {
+    .product-list:not(.grid-view) .product-info {
       display: flex;
       align-items: center;
       gap: 10px;
       flex: 1;
     }
 
-    .product-img {
+    .product-list:not(.grid-view) .product-img {
       width: 48px;
       height: 48px;
       border-radius: 50%;
@@ -151,6 +188,79 @@
       cursor: pointer;
     }
 
+    .product-list:not(.grid-view) .product-action {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      min-width: 90px;
+    }
+
+    /* Grid Item View Specific Layout */
+    .product-list.grid-view .product-card {
+      justify-content: space-between;
+      padding: 10px;
+    }
+
+    .product-list.grid-view .product-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+    }
+
+    .product-list.grid-view .product-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .product-list.grid-view .product-img {
+      width: 100%;
+      height: 100px;
+      border-radius: 14px;
+      object-fit: cover;
+      background: #d1d5db;
+      cursor: pointer;
+    }
+
+    .product-list.grid-view .product-details h3 {
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .product-list.grid-view .product-details p {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-size: 10px;
+    }
+
+    .product-list.grid-view .product-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    .product-list.grid-view .qty-controls {
+      width: 100%;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+
+    .product-list.grid-view .option-select {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Shared Card Styles */
     .product-details {
       display: flex;
       flex-direction: column;
@@ -168,15 +278,6 @@
       font-size: 11px;
       color: var(--text-muted);
       line-height: 1.2;
-    }
-
-    .product-action {
-      text-align: right;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
-      min-width: 90px;
     }
 
     .price {
@@ -215,6 +316,7 @@
       border-top: 1px dashed #d1d5db;
       padding-top: 6px;
       margin-top: 2px;
+      width: 100%;
     }
 
     .option-select-container label {
@@ -263,6 +365,43 @@
       border: 1px solid #ccc;
       font-size: 13px;
       outline: none;
+    }
+
+    /* Price Breakdown */
+    .summary-card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px;
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+    }
+
+    .summary-row.total {
+      border-top: 1px dashed #d1d5db;
+      padding-top: 6px;
+      margin-top: 4px;
+      font-size: 15px;
+      font-weight: bold;
+      color: var(--text-dark);
+    }
+
+    .delivery-badge {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-weight: 600;
     }
 
     .submit-btn {
@@ -335,13 +474,16 @@
     <button class="category-btn" onclick="filterCategory('Dessert', event)">Desserts حلويات</button>
   </div>
 
-  <!-- Toolbar -->
+  <!-- Toolbar with View Toggle -->
   <div class="toolbar">
-    <span id="product-count" style="font-size: 12px; font-weight: 500;">Listing products</span>
     <input type="text" id="search" class="search-input" placeholder="🔍 Search product" onkeyup="searchProducts()">
+    <div class="view-toggle">
+      <button type="button" id="btn-list-view" class="toggle-btn active" onclick="setViewMode('list')" title="List View">☰</button>
+      <button type="button" id="btn-grid-view" class="toggle-btn" onclick="setViewMode('grid')" title="Grid View">⊞</button>
+    </div>
   </div>
 
-  <!-- Product List -->
+  <!-- Product List Container -->
   <div class="product-list" id="product-list"></div>
 
   <!-- Checkout Form -->
@@ -354,8 +496,15 @@
       </div>
 
       <div class="form-group">
-        <label for="phone">Phone Number *</label>
-        <input type="tel" id="phone" required placeholder="e.g. 07XXXXXXXX">
+        <label for="phone">Phone Number (Numbers Only) *</label>
+        <input 
+          type="tel" 
+          id="phone" 
+          required 
+          placeholder="07XXXXXXXX" 
+          inputmode="numeric" 
+          pattern="[0-9]*" 
+          oninput="this.value = this.value.replace(/[^0-9]/g, '')">
       </div>
 
       <div class="form-group">
@@ -376,10 +525,21 @@
         </select>
       </div>
 
-      <!-- Total summary -->
-      <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: bold; margin: 15px 0;">
-        <span>Total Amount:</span>
-        <span id="total-price">JOD 0.00</span>
+      <!-- Pricing Breakdown -->
+      <div class="summary-card">
+        <div class="summary-row">
+          <span>Items Subtotal:</span>
+          <span id="subtotal-price">JOD 0.00</span>
+        </div>
+        <div class="summary-row">
+          <span>Delivery Fee:</span>
+          <span id="delivery-price">JOD 0.00</span>
+        </div>
+        <div id="delivery-info" style="font-size: 11px; color: #6b7280;">Free delivery on orders of 25 JOD or more</div>
+        <div class="summary-row total">
+          <span>Total Amount:</span>
+          <span id="total-price">JOD 0.00</span>
+        </div>
       </div>
 
       <button type="submit" class="submit-btn">Submit Order</button>
@@ -453,6 +613,7 @@
   let cart = {};
   let activeCategory = 'All';
   let pendingPayload = null;
+  let currentView = 'list'; // 'list' or 'grid'
 
   // Set min date to tomorrow
   const dateInput = document.getElementById('receivingDate');
@@ -460,10 +621,26 @@
   tomorrow.setDate(tomorrow.getDate() + 1);
   dateInput.min = tomorrow.toISOString().split('T')[0];
 
+  function setViewMode(mode) {
+    currentView = mode;
+    const listEl = document.getElementById('product-list');
+    const btnList = document.getElementById('btn-list-view');
+    const btnGrid = document.getElementById('btn-grid-view');
+
+    if (mode === 'grid') {
+      listEl.classList.add('grid-view');
+      btnGrid.classList.add('active');
+      btnList.classList.remove('active');
+    } else {
+      listEl.classList.remove('grid-view');
+      btnList.classList.add('active');
+      btnGrid.classList.remove('active');
+    }
+  }
+
   function renderProducts(items) {
     const list = document.getElementById('product-list');
     list.innerHTML = '';
-    document.getElementById('product-count').innerText = `Listing ${items.length} products`;
 
     items.forEach(p => {
       const cartItem = cart[p.id] || { qty: 0, option: p.options && p.options.length > 0 ? p.options[0] : '' };
@@ -472,7 +649,7 @@
       if (p.options && p.options.length > 0) {
         optionsHTML = `
           <div class="option-select-container">
-            <label for="opt-${p.id}">Select Choice:</label>
+            <label for="opt-${p.id}">Choice:</label>
             <select id="opt-${p.id}" class="option-select" onchange="changeOption(${p.id}, this.value)">
               ${p.options.map(opt => `<option value="${opt}" ${cartItem.option === opt ? 'selected' : ''}>${opt}</option>`).join('')}
             </select>
@@ -496,7 +673,6 @@
             </div>
             <div class="product-action">
               <div class="price">JOD ${p.price.toFixed(2)}</div>
-              <div class="unit">Unit</div>
               <div class="qty-controls">
                 <button class="qty-btn" type="button" onclick="updateQty(${p.id}, -1)">-</button>
                 <span>${cartItem.qty}</span>
@@ -524,7 +700,7 @@
     }
 
     applyCurrentFilters();
-    calculateTotal();
+    calculateTotals();
   }
 
   function changeOption(id, selectedValue) {
@@ -535,14 +711,33 @@
     }
   }
 
-  function calculateTotal() {
-    let total = 0;
+  function calculateTotals() {
+    let subtotal = 0;
     for (let id in cart) {
       const item = products.find(p => p.id == id);
-      total += item.price * cart[id].qty;
+      subtotal += item.price * cart[id].qty;
     }
+
+    let delivery = 0;
+    if (subtotal > 0) {
+      delivery = subtotal >= 25 ? 0 : 2;
+    }
+
+    const total = subtotal + delivery;
+
+    document.getElementById('subtotal-price').innerText = `JOD ${subtotal.toFixed(2)}`;
+    
+    if (subtotal === 0) {
+      document.getElementById('delivery-price').innerText = `JOD 0.00`;
+    } else if (delivery === 0) {
+      document.getElementById('delivery-price').innerHTML = `<span class="delivery-badge">FREE</span>`;
+    } else {
+      document.getElementById('delivery-price').innerText = `JOD ${delivery.toFixed(2)}`;
+    }
+
     document.getElementById('total-price').innerText = `JOD ${total.toFixed(2)}`;
-    return total;
+
+    return { subtotal, delivery, total };
   }
 
   function filterCategory(cat, event) {
@@ -589,9 +784,16 @@
 
   function handleOrderSubmit(e) {
     e.preventDefault();
-    const total = calculateTotal();
-    if (total === 0) {
+    const { subtotal, delivery, total } = calculateTotals();
+
+    if (subtotal === 0) {
       alert('Please select at least one item before submitting your order.');
+      return;
+    }
+
+    const phoneVal = document.getElementById('phone').value.trim();
+    if (!/^\d+$/.test(phoneVal)) {
+      alert('Please enter a valid numeric phone number.');
       return;
     }
 
@@ -612,15 +814,19 @@
     }
 
     pendingPayload = {
-      name: document.getElementById('fullName').value,
-      phone: document.getElementById('phone').value,
+      name: document.getElementById('fullName').value.trim(),
+      phone: phoneVal,
       date: document.getElementById('receivingDate').value,
-      address: document.getElementById('address').value,
+      address: document.getElementById('address').value.trim(),
       payment: document.getElementById('paymentMethod').value,
       itemsList: itemsList,
       itemsText: itemsTextArr.join('\n'),
+      subtotal: subtotal.toFixed(2),
+      delivery: delivery.toFixed(2),
       total: total.toFixed(2)
     };
+
+    const deliveryDisplay = delivery === 0 ? "FREE" : `JOD ${delivery.toFixed(2)}`;
 
     const summaryHTML = `
       <strong>Customer Name:</strong> ${pendingPayload.name}<br>
@@ -629,7 +835,9 @@
       <strong>Address:</strong> ${pendingPayload.address}<br>
       <strong>Payment Method:</strong> ${pendingPayload.payment}<br><hr style="border:0; border-top:1px dashed #ccc; margin:8px 0;">
       <strong>Order Items:</strong><br>${itemsTextArr.join('<br>')}<br><hr style="border:0; border-top:1px dashed #ccc; margin:8px 0;">
-      <strong style="font-size: 14px;">Total Amount: JOD ${pendingPayload.total}</strong>
+      <strong>Subtotal:</strong> JOD ${pendingPayload.subtotal}<br>
+      <strong>Delivery Fee:</strong> ${deliveryDisplay}<br>
+      <strong style="font-size: 15px; color: #000;">Total Amount: JOD ${pendingPayload.total}</strong>
     `;
 
     document.getElementById('confirmDetails').innerHTML = summaryHTML;
@@ -648,8 +856,6 @@
     confirmBtn.disabled = true;
 
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCY04lSBq6HQClRXIJc-rfuSFNSikCXq0_yc5cTk2rA57WwuJOTjRXlD411kk_9rhB/exec";
-    
-    // Strict format: Only country code + digits, no leading 00, no spaces, no +
     const targetWhatsApp = "962797096976";
 
     let pdfUrl = "";
@@ -683,6 +889,7 @@
       closeConfirmModal();
 
       let pdfLinkText = pdfUrl ? `\n\n📄 *Download PDF Invoice:* ${pdfUrl}` : "";
+      const deliveryText = parseFloat(pendingPayload.delivery) === 0 ? "FREE" : `JOD ${pendingPayload.delivery}`;
 
       const waText = encodeURIComponent(
         `*NEW ORDER RECEIVED*\n` +
@@ -693,14 +900,13 @@
         `*Address:* ${pendingPayload.address}\n` +
         `*Payment Method:* ${pendingPayload.payment}\n\n` +
         `*Order Items:*\n${pendingPayload.itemsText}\n\n` +
+        `*Subtotal:* JOD ${pendingPayload.subtotal}\n` +
+        `*Delivery Fee:* ${deliveryText}\n` +
         `*Total Amount:* JOD ${pendingPayload.total}` +
         pdfLinkText
       );
 
-      // Clean digits strictly
       const cleanPhone = targetWhatsApp.replace(/\D/g, '');
-      
-      // Route between mobile app and desktop WhatsApp web
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       const waUrl = isMobile 
         ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${waText}`
