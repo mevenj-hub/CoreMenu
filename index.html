@@ -782,7 +782,7 @@
     document.getElementById('imageModal').style.display = 'none';
   }
 
-  function handleOrderSubmit(e) {
+function handleOrderSubmit(e) {
     e.preventDefault();
     const { subtotal, delivery, total } = calculateTotals();
 
@@ -799,17 +799,32 @@
 
     let itemsList = [];
     let itemsTextArr = [];
+    let itemsModalArr = [];
+
     for (let id in cart) {
       if (cart[id].qty > 0) {
         const item = products.find(p => p.id == id);
+        const itemTotal = (item.price * cart[id].qty).toFixed(2);
+        const optText = cart[id].option ? ` (${cart[id].option})` : '';
+
         itemsList.push({
           name: item.name,
           price: item.price,
           qty: cart[id].qty,
           option: cart[id].option || ''
         });
-        const optText = cart[id].option ? ` (${cart[id].option})` : '';
-        itemsTextArr.push(`${item.name}${optText} x${cart[id].qty}`);
+
+        // For plain text (WhatsApp & Sheets)
+        itemsTextArr.push(`${item.name}${optText} — ${cart[id].qty} × JOD ${item.price.toFixed(2)} = JOD ${itemTotal}`);
+
+        // For Confirmation Modal display
+        itemsModalArr.push(`
+          <div style="margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dotted #e5e7eb;">
+            <strong>${item.name}</strong>${optText}<br>
+            <span style="color: #6b7280; font-size: 12px;">${cart[id].qty} × JOD ${item.price.toFixed(2)} = </span>
+            <strong>JOD ${itemTotal}</strong>
+          </div>
+        `);
       }
     }
 
@@ -833,17 +848,25 @@
       <strong>Phone:</strong> ${pendingPayload.phone}<br>
       <strong>Receiving Date:</strong> ${pendingPayload.date}<br>
       <strong>Address:</strong> ${pendingPayload.address}<br>
-      <strong>Payment Method:</strong> ${pendingPayload.payment}<br><hr style="border:0; border-top:1px dashed #ccc; margin:8px 0;">
-      <strong>Order Items:</strong><br>${itemsTextArr.join('<br>')}<br><hr style="border:0; border-top:1px dashed #ccc; margin:8px 0;">
-      <strong>Subtotal:</strong> JOD ${pendingPayload.subtotal}<br>
-      <strong>Delivery Fee:</strong> ${deliveryDisplay}<br>
-      <strong style="font-size: 15px; color: #000;">Total Amount: JOD ${pendingPayload.total}</strong>
+      <strong>Payment Method:</strong> ${pendingPayload.payment}<br>
+      <hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">
+      <strong style="display:block; margin-bottom: 6px;">Order Items:</strong>
+      ${itemsModalArr.join('')}
+      <hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+        <span>Subtotal:</span> <span>JOD ${pendingPayload.subtotal}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+        <span>Delivery Fee:</span> <span>${deliveryDisplay}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size: 15px; font-weight: bold; margin-top: 6px; border-top: 1px solid #ddd; padding-top: 6px;">
+        <span>Total Amount:</span> <span>JOD ${pendingPayload.total}</span>
+      </div>
     `;
 
     document.getElementById('confirmDetails').innerHTML = summaryHTML;
     document.getElementById('confirmModal').style.display = 'flex';
   }
-
   function closeConfirmModal() {
     document.getElementById('confirmModal').style.display = 'none';
   }
