@@ -615,12 +615,6 @@
   let pendingPayload = null;
   let currentView = 'list'; // 'list' or 'grid'
 
-  // Set min date to tomorrow
-  const dateInput = document.getElementById('receivingDate');
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  dateInput.min = tomorrow.toISOString().split('T')[0];
-
   function setViewMode(mode) {
     currentView = mode;
     const listEl = document.getElementById('product-list');
@@ -782,7 +776,7 @@
     document.getElementById('imageModal').style.display = 'none';
   }
 
-function handleOrderSubmit(e) {
+  function handleOrderSubmit(e) {
     e.preventDefault();
     const { subtotal, delivery, total } = calculateTotals();
 
@@ -867,6 +861,7 @@ function handleOrderSubmit(e) {
     document.getElementById('confirmDetails').innerHTML = summaryHTML;
     document.getElementById('confirmModal').style.display = 'flex';
   }
+
   function closeConfirmModal() {
     document.getElementById('confirmModal').style.display = 'none';
   }
