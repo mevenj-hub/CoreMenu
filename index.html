@@ -404,6 +404,17 @@
       font-weight: 600;
     }
 
+    .client-badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #fef3c7;
+      color: #92400e;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
     .submit-btn {
       width: 100%;
       background: var(--accent-black);
@@ -490,6 +501,16 @@
   <div class="checkout-section">
     <h2>Checkout Details</h2>
     <form id="orderForm" onsubmit="handleOrderSubmit(event)">
+      
+      <!-- Client Account Type Selector -->
+      <div class="form-group">
+        <label for="clientType">Client Account / نوع الحساب *</label>
+        <select id="clientType" onchange="handleClientTypeChange()">
+          <option value="standard">Standard Customer (تسعير قياسي)</option>
+          <option value="abdelhadi">مستشفى عبدالهادي (Special Pricing)</option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label for="fullName">Full Name *</label>
         <input type="text" id="fullName" required placeholder="Enter your full name">
@@ -615,6 +636,21 @@
   let pendingPayload = null;
   let currentView = 'list'; // 'list' or 'grid'
 
+  // Helper to dynamically get product price based on active client tier
+  function getEffectivePrice(p) {
+    const clientType = document.getElementById('clientType') ? document.getElementById('clientType').value : 'standard';
+    if (clientType === 'abdelhadi') {
+      if (p.category === 'Salad') return 2.00;
+      if (p.category === 'Sandwiches') return 1.75;
+    }
+    return p.price;
+  }
+
+  function handleClientTypeChange() {
+    applyCurrentFilters();
+    calculateTotals();
+  }
+
   function setViewMode(mode) {
     currentView = mode;
     const listEl = document.getElementById('product-list');
@@ -638,6 +674,7 @@
 
     items.forEach(p => {
       const cartItem = cart[p.id] || { qty: 0, option: p.options && p.options.length > 0 ? p.options[0] : '' };
+      const currentPrice = getEffectivePrice(p);
       
       let optionsHTML = '';
       if (p.options && p.options.length > 0) {
@@ -666,7 +703,7 @@
               </div>
             </div>
             <div class="product-action">
-              <div class="price">JOD ${p.price.toFixed(2)}</div>
+              <div class="price">JOD ${currentPrice.toFixed(2)}</div>
               <div class="qty-controls">
                 <button class="qty-btn" type="button" onclick="updateQty(${p.id}, -1)">-</button>
                 <span>${cartItem.qty}</span>
@@ -709,7 +746,8 @@
     let subtotal = 0;
     for (let id in cart) {
       const item = products.find(p => p.id == id);
-      subtotal += item.price * cart[id].qty;
+      const effectivePrice = getEffectivePrice(item);
+      subtotal += effectivePrice * cart[id].qty;
     }
 
     let delivery = 0;
@@ -791,6 +829,9 @@
       return;
     }
 
+    const clientType = document.getElementById('clientType').value;
+    const clientNameDisplay = clientType === 'abdelhadi' ? 'مستشفى عبدالهادي (Special Pricing)' : 'Standard Customer';
+
     let itemsList = [];
     let itemsTextArr = [];
     let itemsModalArr = [];
@@ -798,24 +839,25 @@
     for (let id in cart) {
       if (cart[id].qty > 0) {
         const item = products.find(p => p.id == id);
-        const itemTotal = (item.price * cart[id].qty).toFixed(2);
+        const itemPrice = getEffectivePrice(item);
+        const itemTotal = (itemPrice * cart[id].qty).toFixed(2);
         const optText = cart[id].option ? ` (${cart[id].option})` : '';
 
         itemsList.push({
           name: item.name,
-          price: item.price,
+          price: itemPrice,
           qty: cart[id].qty,
           option: cart[id].option || ''
         });
 
         // For plain text (WhatsApp & Sheets)
-        itemsTextArr.push(`${item.name}${optText} — ${cart[id].qty} × JOD ${item.price.toFixed(2)} = JOD ${itemTotal}`);
+        itemsTextArr.push(`${item.name}${optText} — ${cart[id].qty} × JOD ${itemPrice.toFixed(2)} = JOD ${itemTotal}`);
 
         // For Confirmation Modal display
         itemsModalArr.push(`
           <div style="margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dotted #e5e7eb;">
             <strong>${item.name}</strong>${optText}<br>
-            <span style="color: #6b7280; font-size: 12px;">${cart[id].qty} × JOD ${item.price.toFixed(2)} = </span>
+            <span style="color: #6b7280; font-size: 12px;">${cart[id].qty} × JOD ${itemPrice.toFixed(2)} = </span>
             <strong>JOD ${itemTotal}</strong>
           </div>
         `);
@@ -823,6 +865,7 @@
     }
 
     pendingPayload = {
+      clientType: clientNameDisplay,
       name: document.getElementById('fullName').value.trim(),
       phone: phoneVal,
       date: document.getElementById('receivingDate').value,
@@ -838,6 +881,7 @@
     const deliveryDisplay = delivery === 0 ? "FREE" : `JOD ${delivery.toFixed(2)}`;
 
     const summaryHTML = `
+      ${clientType === 'abdelhadi' ? '<span class="client-badge">⭐ مستشفى عبدالهادي (Special Rates Applied)</span><br><br>' : ''}
       <strong>Customer Name:</strong> ${pendingPayload.name}<br>
       <strong>Phone:</strong> ${pendingPayload.phone}<br>
       <strong>Receiving Date:</strong> ${pendingPayload.date}<br>
@@ -908,10 +952,12 @@
 
       let pdfLinkText = pdfUrl ? `\n\n📄 *Download PDF Invoice:* ${pdfUrl}` : "";
       const deliveryText = parseFloat(pendingPayload.delivery) === 0 ? "FREE" : `JOD ${pendingPayload.delivery}`;
+      const clientNotice = pendingPayload.clientType.includes('عبدالهادي') ? `*Account Tier:* مستشفى عبدالهادي (Special Rates)\n` : '';
 
       const waText = encodeURIComponent(
         `*NEW ORDER RECEIVED*\n` +
         `----------------------\n` +
+        clientNotice +
         `*Customer Name:* ${pendingPayload.name}\n` +
         `*Phone:* ${pendingPayload.phone}\n` +
         `*Receiving Date:* ${pendingPayload.date}\n` +
@@ -937,7 +983,20 @@
     }
   }
 
-  // Initial render
+  // Check URL parameters for direct client links (e.g., ?client=abdelhadi)
+  function initClientFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const clientParam = params.get('client');
+    if (clientParam && clientParam.toLowerCase().includes('abdelhadi')) {
+      const select = document.getElementById('clientType');
+      if (select) {
+        select.value = 'abdelhadi';
+      }
+    }
+  }
+
+  // Initial setup
+  initClientFromUrl();
   renderProducts(products);
 </script>
 </body>
