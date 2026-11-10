@@ -329,31 +329,27 @@
       outline: none;
     }
 
-    /* Item Note Input inside Card */
-    .item-note-container {
+    /* Per-dish kitchen note under Salads & Sandwiches */
+    .item-kitchen-note-box {
       width: 100%;
-      border-top: 1px dashed #d1d5db;
-      padding-top: 6px;
       margin-top: 4px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
       box-sizing: border-box;
     }
 
-    .item-note-input {
+    .item-kitchen-note-input {
       width: 100%;
+      background: #ffffff;
       border: 1px solid #cccccc;
       border-radius: 8px;
       padding: 5px 8px;
       font-size: 11px;
       outline: none;
-      background: #ffffff;
       box-sizing: border-box;
       font-family: inherit;
+      color: var(--text-dark);
     }
 
-    .item-note-input:focus {
+    .item-kitchen-note-input:focus {
       border-color: var(--accent-black);
     }
 
@@ -730,15 +726,16 @@
         `;
       }
 
-      // Per-item note box displays when qty > 0
-      let itemNoteHTML = '';
-      if (cartItem.qty > 0) {
-        itemNoteHTML = `
-          <div class="item-note-container">
+      // Add Kitchen Note strictly for Salad and Sandwiches
+      let kitchenNoteHTML = '';
+      const isSaladOrSandwich = p.category === 'Salad' || p.category === 'Sandwiches';
+      if (isSaladOrSandwich) {
+        kitchenNoteHTML = `
+          <div class="item-kitchen-note-box">
             <input 
               type="text" 
-              class="item-note-input" 
-              placeholder="✏️ Item Note (e.g. no onion, dressing on side...)" 
+              class="item-kitchen-note-input" 
+              placeholder="Note / ملاحظة (e.g. no onion, sauce aside)" 
               value="${cartItem.itemNote || ''}" 
               oninput="changeItemNote(${p.id}, this.value)">
           </div>
@@ -769,7 +766,7 @@
             </div>
           </div>
           ${optionsHTML}
-          ${itemNoteHTML}
+          ${kitchenNoteHTML}
         </div>
       `;
     });
@@ -801,7 +798,11 @@
   }
 
   function changeItemNote(id, noteValue) {
-    if (cart[id]) {
+    const p = products.find(item => item.id === id);
+    if (!cart[id]) {
+      const defaultOption = p.options && p.options.length > 0 ? p.options[0] : '';
+      cart[id] = { qty: 0, option: defaultOption, itemNote: noteValue };
+    } else {
       cart[id].itemNote = noteValue;
     }
   }
@@ -911,26 +912,27 @@
 
         itemsList.push({
           name: item.name,
+          category: item.category,
           price: itemPrice,
           qty: cart[id].qty,
           option: cart[id].option || '',
           note: itemNote
         });
 
-        // WhatsApp / Plain text representation
+        // WhatsApp / Plain Text
         let line = `• ${item.name}${optText} — ${cart[id].qty} × JOD ${itemPrice.toFixed(2)} = JOD ${itemTotal}`;
         if (itemNote) {
-          line += `\n   ↳ Note: ${itemNote}`;
+          line += `\n   ↳ 📝 Note: ${itemNote}`;
         }
         itemsTextArr.push(line);
 
-        // Modal representation
+        // Confirmation Modal Display
         itemsModalArr.push(`
           <div style="margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px dotted #e5e7eb;">
             <strong>${item.name}</strong>${optText}<br>
             <span style="color: #6b7280; font-size: 12px;">${cart[id].qty} × JOD ${itemPrice.toFixed(2)} = </span>
             <strong>JOD ${itemTotal}</strong>
-            ${itemNote ? `<div style="margin-top: 3px; font-size: 11px; color: #b45309; background: #fffbeb; padding: 3px 6px; border-radius: 6px;">📝 Note: ${itemNote}</div>` : ''}
+            ${itemNote ? `<div style="margin-top: 3px; font-size: 11px; color: #92400e; background: #fef3c7; padding: 3px 6px; border-radius: 6px;">📝 Note: ${itemNote}</div>` : ''}
           </div>
         `);
       }
