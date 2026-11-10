@@ -559,7 +559,7 @@
       <!-- Order Notes / Special Instructions -->
       <div class="form-group">
         <label for="orderNotes">Order Notes / ملاحظات خاصة (Optional)</label>
-        <textarea id="orderNotes" rows="2" placeholder="e.g. Without onions, extra napkins, delivery instructions..."></textarea>
+        <textarea id="orderNotes" rows="2" placeholder="e.g., No onions, extra napkins, delivery instructions..."></textarea>
       </div>
 
       <!-- Pricing Breakdown -->
@@ -866,8 +866,10 @@
           option: cart[id].option || ''
         });
 
+        // For plain text (WhatsApp & Sheets)
         itemsTextArr.push(`${item.name}${optText} — ${cart[id].qty} × JOD ${itemPrice.toFixed(2)} = JOD ${itemTotal}`);
 
+        // For Confirmation Modal display
         itemsModalArr.push(`
           <div style="margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dotted #e5e7eb;">
             <strong>${item.name}</strong>${optText}<br>
