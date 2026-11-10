@@ -285,11 +285,6 @@
       font-size: 13px;
     }
 
-    .unit {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-
     .qty-controls {
       display: flex;
       align-items: center;
@@ -334,6 +329,34 @@
       outline: none;
     }
 
+    /* Item Note Input inside Card */
+    .item-note-container {
+      width: 100%;
+      border-top: 1px dashed #d1d5db;
+      padding-top: 6px;
+      margin-top: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      box-sizing: border-box;
+    }
+
+    .item-note-input {
+      width: 100%;
+      border: 1px solid #cccccc;
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 11px;
+      outline: none;
+      background: #ffffff;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    .item-note-input:focus {
+      border-color: var(--accent-black);
+    }
+
     /* Form & Checkout Section */
     .checkout-section {
       width: 100%;
@@ -374,7 +397,7 @@
 
     .form-group textarea {
       resize: vertical;
-      min-height: 65px;
+      min-height: 55px;
     }
 
     /* Price Breakdown */
@@ -556,10 +579,10 @@
         </select>
       </div>
 
-      <!-- Order Notes / Special Instructions -->
+      <!-- General Delivery / Order Notes -->
       <div class="form-group">
-        <label for="orderNotes">Order Notes / ملاحظات خاصة (Optional)</label>
-        <textarea id="orderNotes" rows="2" placeholder="e.g., No onions, extra napkins, delivery instructions..."></textarea>
+        <label for="orderNotes">General Delivery Notes / ملاحظات التوصيل (Optional)</label>
+        <textarea id="orderNotes" rows="2" placeholder="e.g., Gate code, ring bell, deliver to 3rd floor..."></textarea>
       </div>
 
       <!-- Pricing Breakdown -->
@@ -688,7 +711,11 @@
     list.innerHTML = '';
 
     items.forEach(p => {
-      const cartItem = cart[p.id] || { qty: 0, option: p.options && p.options.length > 0 ? p.options[0] : '' };
+      const cartItem = cart[p.id] || { 
+        qty: 0, 
+        option: p.options && p.options.length > 0 ? p.options[0] : '',
+        itemNote: ''
+      };
       const currentPrice = getEffectivePrice(p);
       
       let optionsHTML = '';
@@ -699,6 +726,21 @@
             <select id="opt-${p.id}" class="option-select" onchange="changeOption(${p.id}, this.value)">
               ${p.options.map(opt => `<option value="${opt}" ${cartItem.option === opt ? 'selected' : ''}>${opt}</option>`).join('')}
             </select>
+          </div>
+        `;
+      }
+
+      // Per-item note box displays when qty > 0
+      let itemNoteHTML = '';
+      if (cartItem.qty > 0) {
+        itemNoteHTML = `
+          <div class="item-note-container">
+            <input 
+              type="text" 
+              class="item-note-input" 
+              placeholder="✏️ Item Note (e.g. no onion, dressing on side...)" 
+              value="${cartItem.itemNote || ''}" 
+              oninput="changeItemNote(${p.id}, this.value)">
           </div>
         `;
       }
@@ -727,6 +769,7 @@
             </div>
           </div>
           ${optionsHTML}
+          ${itemNoteHTML}
         </div>
       `;
     });
@@ -736,7 +779,7 @@
     const p = products.find(item => item.id === id);
     if (!cart[id]) {
       const defaultOption = p.options && p.options.length > 0 ? p.options[0] : '';
-      cart[id] = { qty: 0, option: defaultOption };
+      cart[id] = { qty: 0, option: defaultOption, itemNote: '' };
     }
 
     cart[id].qty += change;
@@ -753,7 +796,13 @@
     if (cart[id]) {
       cart[id].option = selectedValue;
     } else {
-      cart[id] = { qty: 0, option: selectedValue };
+      cart[id] = { qty: 0, option: selectedValue, itemNote: '' };
+    }
+  }
+
+  function changeItemNote(id, noteValue) {
+    if (cart[id]) {
+      cart[id].itemNote = noteValue;
     }
   }
 
@@ -846,7 +895,7 @@
 
     const clientType = document.getElementById('clientType').value;
     const clientNameDisplay = clientType === 'abdelhadi' ? 'مستشفى عبدالهادي (Special Pricing)' : 'Standard Customer';
-    const notesVal = document.getElementById('orderNotes').value.trim();
+    const generalNotesVal = document.getElementById('orderNotes').value.trim();
 
     let itemsList = [];
     let itemsTextArr = [];
@@ -858,23 +907,30 @@
         const itemPrice = getEffectivePrice(item);
         const itemTotal = (itemPrice * cart[id].qty).toFixed(2);
         const optText = cart[id].option ? ` (${cart[id].option})` : '';
+        const itemNote = (cart[id].itemNote || '').trim();
 
         itemsList.push({
           name: item.name,
           price: itemPrice,
           qty: cart[id].qty,
-          option: cart[id].option || ''
+          option: cart[id].option || '',
+          note: itemNote
         });
 
-        // For plain text (WhatsApp & Sheets)
-        itemsTextArr.push(`${item.name}${optText} — ${cart[id].qty} × JOD ${itemPrice.toFixed(2)} = JOD ${itemTotal}`);
+        // WhatsApp / Plain text representation
+        let line = `• ${item.name}${optText} — ${cart[id].qty} × JOD ${itemPrice.toFixed(2)} = JOD ${itemTotal}`;
+        if (itemNote) {
+          line += `\n   ↳ Note: ${itemNote}`;
+        }
+        itemsTextArr.push(line);
 
-        // For Confirmation Modal display
+        // Modal representation
         itemsModalArr.push(`
-          <div style="margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dotted #e5e7eb;">
+          <div style="margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px dotted #e5e7eb;">
             <strong>${item.name}</strong>${optText}<br>
             <span style="color: #6b7280; font-size: 12px;">${cart[id].qty} × JOD ${itemPrice.toFixed(2)} = </span>
             <strong>JOD ${itemTotal}</strong>
+            ${itemNote ? `<div style="margin-top: 3px; font-size: 11px; color: #b45309; background: #fffbeb; padding: 3px 6px; border-radius: 6px;">📝 Note: ${itemNote}</div>` : ''}
           </div>
         `);
       }
@@ -887,9 +943,9 @@
       date: document.getElementById('receivingDate').value,
       address: document.getElementById('address').value.trim(),
       payment: document.getElementById('paymentMethod').value,
-      notes: notesVal,
+      generalNotes: generalNotesVal,
       itemsList: itemsList,
-      itemsText: itemsTextArr.join('\n'),
+      itemsText: itemsTextArr.join('\n\n'),
       subtotal: subtotal.toFixed(2),
       delivery: delivery.toFixed(2),
       total: total.toFixed(2)
@@ -904,9 +960,9 @@
       <strong>Receiving Date:</strong> ${pendingPayload.date}<br>
       <strong>Address:</strong> ${pendingPayload.address}<br>
       <strong>Payment Method:</strong> ${pendingPayload.payment}<br>
-      ${pendingPayload.notes ? `<strong>Notes:</strong> <em>${pendingPayload.notes}</em><br>` : ''}
+      ${pendingPayload.generalNotes ? `<strong>Delivery Notes:</strong> <em>${pendingPayload.generalNotes}</em><br>` : ''}
       <hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">
-      <strong style="display:block; margin-bottom: 6px;">Order Items:</strong>
+      <strong style="display:block; margin-bottom: 6px;">Order Items & Dish Instructions:</strong>
       ${itemsModalArr.join('')}
       <hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">
       <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
@@ -971,7 +1027,7 @@
       let pdfLinkText = pdfUrl ? `\n\n📄 *Download PDF Invoice:* ${pdfUrl}` : "";
       const deliveryText = parseFloat(pendingPayload.delivery) === 0 ? "FREE" : `JOD ${pendingPayload.delivery}`;
       const clientNotice = pendingPayload.clientType.includes('عبدالهادي') ? `*Account Tier:* مستشفى عبدالهادي (Special Rates)\n` : '';
-      const notesSection = pendingPayload.notes ? `*Notes:* ${pendingPayload.notes}\n` : '';
+      const deliveryNotesSection = pendingPayload.generalNotes ? `*Delivery Notes:* ${pendingPayload.generalNotes}\n` : '';
 
       const waText = encodeURIComponent(
         `*NEW ORDER RECEIVED*\n` +
@@ -982,8 +1038,8 @@
         `*Receiving Date:* ${pendingPayload.date}\n` +
         `*Address:* ${pendingPayload.address}\n` +
         `*Payment Method:* ${pendingPayload.payment}\n` +
-        notesSection +
-        `\n*Order Items:*\n${pendingPayload.itemsText}\n\n` +
+        deliveryNotesSection +
+        `\n*Order Items & Kitchen Notes:*\n${pendingPayload.itemsText}\n\n` +
         `*Subtotal:* JOD ${pendingPayload.subtotal}\n` +
         `*Delivery Fee:* ${deliveryText}\n` +
         `*Total Amount:* JOD ${pendingPayload.total}` +
