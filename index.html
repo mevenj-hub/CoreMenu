@@ -359,12 +359,22 @@
       font-weight: 600;
     }
 
-    .form-group input, .form-group select {
+    .form-group input, 
+    .form-group select,
+    .form-group textarea {
       padding: 9px 12px;
       border-radius: 10px;
       border: 1px solid #ccc;
       font-size: 13px;
       outline: none;
+      font-family: inherit;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 65px;
     }
 
     /* Price Breakdown */
@@ -546,6 +556,12 @@
         </select>
       </div>
 
+      <!-- Order Notes / Special Instructions -->
+      <div class="form-group">
+        <label for="orderNotes">Order Notes / ملاحظات خاصة (Optional)</label>
+        <textarea id="orderNotes" rows="2" placeholder="e.g. Without onions, extra napkins, delivery instructions..."></textarea>
+      </div>
+
       <!-- Pricing Breakdown -->
       <div class="summary-card">
         <div class="summary-row">
@@ -634,9 +650,8 @@
   let cart = {};
   let activeCategory = 'All';
   let pendingPayload = null;
-  let currentView = 'list'; // 'list' or 'grid'
+  let currentView = 'list';
 
-  // Helper to dynamically get product price based on active client tier
   function getEffectivePrice(p) {
     const clientType = document.getElementById('clientType') ? document.getElementById('clientType').value : 'standard';
     if (clientType === 'abdelhadi') {
@@ -831,6 +846,7 @@
 
     const clientType = document.getElementById('clientType').value;
     const clientNameDisplay = clientType === 'abdelhadi' ? 'مستشفى عبدالهادي (Special Pricing)' : 'Standard Customer';
+    const notesVal = document.getElementById('orderNotes').value.trim();
 
     let itemsList = [];
     let itemsTextArr = [];
@@ -850,10 +866,8 @@
           option: cart[id].option || ''
         });
 
-        // For plain text (WhatsApp & Sheets)
         itemsTextArr.push(`${item.name}${optText} — ${cart[id].qty} × JOD ${itemPrice.toFixed(2)} = JOD ${itemTotal}`);
 
-        // For Confirmation Modal display
         itemsModalArr.push(`
           <div style="margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dotted #e5e7eb;">
             <strong>${item.name}</strong>${optText}<br>
@@ -871,6 +885,7 @@
       date: document.getElementById('receivingDate').value,
       address: document.getElementById('address').value.trim(),
       payment: document.getElementById('paymentMethod').value,
+      notes: notesVal,
       itemsList: itemsList,
       itemsText: itemsTextArr.join('\n'),
       subtotal: subtotal.toFixed(2),
@@ -887,6 +902,7 @@
       <strong>Receiving Date:</strong> ${pendingPayload.date}<br>
       <strong>Address:</strong> ${pendingPayload.address}<br>
       <strong>Payment Method:</strong> ${pendingPayload.payment}<br>
+      ${pendingPayload.notes ? `<strong>Notes:</strong> <em>${pendingPayload.notes}</em><br>` : ''}
       <hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">
       <strong style="display:block; margin-bottom: 6px;">Order Items:</strong>
       ${itemsModalArr.join('')}
@@ -953,6 +969,7 @@
       let pdfLinkText = pdfUrl ? `\n\n📄 *Download PDF Invoice:* ${pdfUrl}` : "";
       const deliveryText = parseFloat(pendingPayload.delivery) === 0 ? "FREE" : `JOD ${pendingPayload.delivery}`;
       const clientNotice = pendingPayload.clientType.includes('عبدالهادي') ? `*Account Tier:* مستشفى عبدالهادي (Special Rates)\n` : '';
+      const notesSection = pendingPayload.notes ? `*Notes:* ${pendingPayload.notes}\n` : '';
 
       const waText = encodeURIComponent(
         `*NEW ORDER RECEIVED*\n` +
@@ -962,8 +979,9 @@
         `*Phone:* ${pendingPayload.phone}\n` +
         `*Receiving Date:* ${pendingPayload.date}\n` +
         `*Address:* ${pendingPayload.address}\n` +
-        `*Payment Method:* ${pendingPayload.payment}\n\n` +
-        `*Order Items:*\n${pendingPayload.itemsText}\n\n` +
+        `*Payment Method:* ${pendingPayload.payment}\n` +
+        notesSection +
+        `\n*Order Items:*\n${pendingPayload.itemsText}\n\n` +
         `*Subtotal:* JOD ${pendingPayload.subtotal}\n` +
         `*Delivery Fee:* ${deliveryText}\n` +
         `*Total Amount:* JOD ${pendingPayload.total}` +
@@ -983,7 +1001,6 @@
     }
   }
 
-  // Check URL parameters for direct client links (e.g., ?client=abdelhadi)
   function initClientFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const clientParam = params.get('client');
@@ -995,7 +1012,6 @@
     }
   }
 
-  // Initial setup
   initClientFromUrl();
   renderProducts(products);
 </script>
