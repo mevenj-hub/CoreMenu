@@ -433,17 +433,6 @@
       font-weight: 600;
     }
 
-    .client-badge {
-      display: inline-block;
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: #fef3c7;
-      color: #92400e;
-      font-weight: 600;
-      margin-top: 2px;
-    }
-
     .submit-btn {
       width: 100%;
       background: var(--accent-black);
@@ -495,6 +484,7 @@
       max-width: 400px;
       width: 90%;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      text-align: center;
     }
   </style>
 </head>
@@ -530,15 +520,6 @@
   <div class="checkout-section">
     <h2>Checkout Details</h2>
     <form id="orderForm" onsubmit="handleOrderSubmit(event)">
-      
-      <!-- Client Account Type Selector -->
-      <div class="form-group">
-        <label for="clientType">Client Account / نوع الحساب *</label>
-        <select id="clientType" onchange="handleClientTypeChange()">
-          <option value="standard">Standard Customer (تسعير قياسي)</option>
-          <option value="abdelhadi">مستشفى عبدالهادي (Special Pricing)</option>
-        </select>
-      </div>
 
       <div class="form-group">
         <label for="fullName">Full Name *</label>
@@ -611,9 +592,22 @@
   </div>
 </div>
 
+<!-- Order Cutoff Notice Modal -->
+<div id="cutoffModal" class="modal-overlay" style="display: none;" onclick="closeCutoffModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div style="font-size: 32px; margin-bottom: 8px;">⏰</div>
+    <h3 style="margin: 0 0 10px 0; font-size: 18px;">Ordering Closed for Today</h3>
+    <p style="font-size: 13px; color: #4b5563; line-height: 1.5; margin: 0 0 16px 0;">
+      Sorry, your order cannot be accepted right now. Kindly place your order before <strong>1:30 AM</strong>.<br><br>
+      <span dir="rtl">عذراً، لا يمكن قبول الطلب حالياً. يرجى تقديم طلبك قبل الساعة <strong>1:30 صباحاً</strong>.</span>
+    </p>
+    <button type="button" onclick="closeCutoffModal()" style="width: 100%; padding: 11px; border-radius: 10px; border: none; background: #000000; color: #ffffff; cursor: pointer; font-weight: bold;">OK / حسناً</button>
+  </div>
+</div>
+
 <!-- Order Summary & Confirmation Modal -->
 <div id="confirmModal" class="modal-overlay" style="display: none;">
-  <div class="modal-box">
+  <div class="modal-box" style="text-align: left;">
     <h3 style="margin-top: 0; font-size: 18px; text-align: center;">Confirm Your Order</h3>
     <div id="confirmDetails" style="max-height: 250px; overflow-y: auto; margin: 15px 0; background: #f9f9f9; padding: 12px; border-radius: 10px; font-size: 13px; line-height: 1.5;"></div>
     
@@ -671,18 +665,33 @@
   let pendingPayload = null;
   let currentView = 'list';
 
-  function getEffectivePrice(p) {
-    const clientType = document.getElementById('clientType') ? document.getElementById('clientType').value : 'standard';
-    if (clientType === 'abdelhadi') {
-      if (p.category === 'Salad') return 2.00;
-      if (p.category === 'Sandwiches') return 1.75;
-    }
-    return p.price;
+  // Returns today's local date formatted as YYYY-MM-DD
+  function getTodayLocalStr() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
-  function handleClientTypeChange() {
-    applyCurrentFilters();
-    calculateTotals();
+  // Enforce today or future dates on the date input
+  function initDateRestriction() {
+    const dateInput = document.getElementById('receivingDate');
+    if (dateInput) {
+      dateInput.min = getTodayLocalStr();
+    }
+  }
+
+  // Returns true if current local time is >= 1:30 AM
+  function isPastCutoffTime() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    return hours > 1 || (hours === 1 && minutes >= 30);
+  }
+
+  function closeCutoffModal() {
+    document.getElementById('cutoffModal').style.display = 'none';
   }
 
   function setViewMode(mode) {
@@ -712,7 +721,6 @@
         option: p.options && p.options.length > 0 ? p.options[0] : '',
         itemNote: ''
       };
-      const currentPrice = getEffectivePrice(p);
       
       let optionsHTML = '';
       if (p.options && p.options.length > 0) {
@@ -757,7 +765,7 @@
               </div>
             </div>
             <div class="product-action">
-              <div class="price">JOD ${currentPrice.toFixed(2)}</div>
+              <div class="price">JOD ${p.price.toFixed(2)}</div>
               <div class="qty-controls">
                 <button class="qty-btn" type="button" onclick="updateQty(${p.id}, -1)">-</button>
                 <span>${cartItem.qty}</span>
@@ -811,8 +819,7 @@
     let subtotal = 0;
     for (let id in cart) {
       const item = products.find(p => p.id == id);
-      const effectivePrice = getEffectivePrice(item);
-      subtotal += effectivePrice * cart[id].qty;
+      subtotal += item.price * cart[id].qty;
     }
 
     let delivery = 0;
@@ -881,6 +888,13 @@
 
   function handleOrderSubmit(e) {
     e.preventDefault();
+
+    // Check 1:30 AM cutoff time
+    if (isPastCutoffTime()) {
+      document.getElementById('cutoffModal').style.display = 'flex';
+      return;
+    }
+
     const { subtotal, delivery, total } = calculateTotals();
 
     if (subtotal === 0) {
@@ -894,8 +908,13 @@
       return;
     }
 
-    const clientType = document.getElementById('clientType').value;
-    const clientNameDisplay = clientType === 'abdelhadi' ? 'مستشفى عبدالهادي (Special Pricing)' : 'Standard Customer';
+    const selectedDate = document.getElementById('receivingDate').value;
+    const todayStr = getTodayLocalStr();
+    if (!selectedDate || selectedDate < todayStr) {
+      alert('Please select today or a future date for receiving your order.');
+      return;
+    }
+
     const generalNotesVal = document.getElementById('orderNotes').value.trim();
 
     let itemsList = [];
@@ -905,7 +924,7 @@
     for (let id in cart) {
       if (cart[id].qty > 0) {
         const item = products.find(p => p.id == id);
-        const itemPrice = getEffectivePrice(item);
+        const itemPrice = item.price;
         const itemTotal = (itemPrice * cart[id].qty).toFixed(2);
         const optText = cart[id].option ? ` (${cart[id].option})` : '';
         const itemNote = (cart[id].itemNote || '').trim();
@@ -939,10 +958,9 @@
     }
 
     pendingPayload = {
-      clientType: clientNameDisplay,
       name: document.getElementById('fullName').value.trim(),
       phone: phoneVal,
-      date: document.getElementById('receivingDate').value,
+      date: selectedDate,
       address: document.getElementById('address').value.trim(),
       payment: document.getElementById('paymentMethod').value,
       generalNotes: generalNotesVal,
@@ -956,7 +974,6 @@
     const deliveryDisplay = delivery === 0 ? "FREE" : `JOD ${delivery.toFixed(2)}`;
 
     const summaryHTML = `
-      ${clientType === 'abdelhadi' ? '<span class="client-badge">⭐ مستشفى عبدالهادي (Special Rates Applied)</span><br><br>' : ''}
       <strong>Customer Name:</strong> ${pendingPayload.name}<br>
       <strong>Phone:</strong> ${pendingPayload.phone}<br>
       <strong>Receiving Date:</strong> ${pendingPayload.date}<br>
@@ -1028,13 +1045,11 @@
 
       let pdfLinkText = pdfUrl ? `\n\n📄 *Download PDF Invoice:* ${pdfUrl}` : "";
       const deliveryText = parseFloat(pendingPayload.delivery) === 0 ? "FREE" : `JOD ${pendingPayload.delivery}`;
-      const clientNotice = pendingPayload.clientType.includes('عبدالهادي') ? `*Account Tier:* مستشفى عبدالهادي (Special Rates)\n` : '';
       const deliveryNotesSection = pendingPayload.generalNotes ? `*Delivery Notes:* ${pendingPayload.generalNotes}\n` : '';
 
       const waText = encodeURIComponent(
         `*NEW ORDER RECEIVED*\n` +
         `----------------------\n` +
-        clientNotice +
         `*Customer Name:* ${pendingPayload.name}\n` +
         `*Phone:* ${pendingPayload.phone}\n` +
         `*Receiving Date:* ${pendingPayload.date}\n` +
@@ -1061,18 +1076,7 @@
     }
   }
 
-  function initClientFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-    const clientParam = params.get('client');
-    if (clientParam && clientParam.toLowerCase().includes('abdelhadi')) {
-      const select = document.getElementById('clientType');
-      if (select) {
-        select.value = 'abdelhadi';
-      }
-    }
-  }
-
-  initClientFromUrl();
+  initDateRestriction();
   renderProducts(products);
 </script>
 </body>
