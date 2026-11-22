@@ -539,7 +539,7 @@
       </div>
 
       <div class="form-group">
-        <label for="receivingDate">Receiving Date *</label>
+        <label for="receivingDate">Receiving Date (Pre-Order Starting Tomorrow) *</label>
         <input type="date" id="receivingDate" required>
       </div>
 
@@ -596,10 +596,10 @@
 <div id="cutoffModal" class="modal-overlay" style="display: none;" onclick="closeCutoffModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div style="font-size: 32px; margin-bottom: 8px;">⏰</div>
-    <h3 style="margin: 0 0 10px 0; font-size: 18px;">Ordering Closed for Today</h3>
+    <h3 style="margin: 0 0 10px 0; font-size: 18px;">Pre-Ordering Cutoff Passed</h3>
     <p style="font-size: 13px; color: #4b5563; line-height: 1.5; margin: 0 0 16px 0;">
-      Sorry, your order cannot be accepted right now. Kindly place your order before <strong>1:30 AM</strong>.<br><br>
-      <span dir="rtl">عذراً، لا يمكن قبول الطلب حالياً. يرجى تقديم طلبك قبل الساعة <strong>1:30 صباحاً</strong>.</span>
+      Sorry, orders cannot be accepted after <strong>1:30 AM</strong>. Kindly place your order before 1:30 AM for next-day delivery.<br><br>
+      <span dir="rtl">عذراً، لا يمكن قبول الطلب بعد الساعة <strong>1:30 صباحاً</strong>. يرجى تقديم طلبك قبل الساعة 1:30 صباحاً للتوصيل في اليوم التالي.</span>
     </p>
     <button type="button" onclick="closeCutoffModal()" style="width: 100%; padding: 11px; border-radius: 10px; border: none; background: #000000; color: #ffffff; cursor: pointer; font-weight: bold;">OK / حسناً</button>
   </div>
@@ -665,29 +665,37 @@
   let pendingPayload = null;
   let currentView = 'list';
 
-  // Returns today's local date formatted as YYYY-MM-DD
-  function getTodayLocalStr() {
+  // Returns earliest valid pre-order date (YYYY-MM-DD):
+  // - If ordering between 8:00 AM and 11:59 PM -> tomorrow
+  // - If ordering between 12:00 AM and 1:29 AM -> today (that same morning)
+  function getEarliestDeliveryDateStr() {
     const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
+    const minDate = new Date(now);
+    if (now.getHours() >= 8) {
+      minDate.setDate(minDate.getDate() + 1);
+    }
+    const year = minDate.getFullYear();
+    const month = String(minDate.getMonth() + 1).padStart(2, '0');
+    const day = String(minDate.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
 
-  // Enforce today or future dates on the date input
+  // Enforce next-day (or post-midnight same-morning) pre-order date restriction
   function initDateRestriction() {
     const dateInput = document.getElementById('receivingDate');
     if (dateInput) {
-      dateInput.min = getTodayLocalStr();
+      dateInput.min = getEarliestDeliveryDateStr();
     }
   }
 
-  // Returns true if current local time is >= 1:30 AM
+  // Ordering is closed between 1:30 AM and 8:00 AM
+  // Open from 8:00 AM through the evening up to 1:29 AM
   function isPastCutoffTime() {
     const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    return hours > 1 || (hours === 1 && minutes >= 30);
+    const totalMinutes = now.getHours() * 60 + now.getMinutes();
+    const cutoffStart = 1 * 60 + 30;  // 1:30 AM (90 mins)
+    const reopenTime = 8 * 60;        // 8:00 AM (480 mins)
+    return totalMinutes >= cutoffStart && totalMinutes < reopenTime;
   }
 
   function closeCutoffModal() {
@@ -889,7 +897,7 @@
   function handleOrderSubmit(e) {
     e.preventDefault();
 
-    // Check 1:30 AM cutoff time
+    // Check if ordering is closed (1:30 AM - 8:00 AM)
     if (isPastCutoffTime()) {
       document.getElementById('cutoffModal').style.display = 'flex';
       return;
@@ -909,9 +917,9 @@
     }
 
     const selectedDate = document.getElementById('receivingDate').value;
-    const todayStr = getTodayLocalStr();
-    if (!selectedDate || selectedDate < todayStr) {
-      alert('Please select today or a future date for receiving your order.');
+    const minValidDate = getEarliestDeliveryDateStr();
+    if (!selectedDate || selectedDate < minValidDate) {
+      alert('Delivery is by pre-order only. Please select tomorrow or a future date.');
       return;
     }
 
